@@ -27,7 +27,7 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       await new Promise<void>((resolve) => {
         reader.onloadend = () => {
           const base64data = reader.result as string;
-          doc.addImage(base64data, 'JPEG', 15, yPosition, 90, 22);
+          doc.addImage(base64data, 'JPEG', 15, yPosition, 105, 26);
           resolve();
         };
         reader.readAsDataURL(blob);
@@ -36,7 +36,7 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       console.error('Error loading logo:', error);
     }
 
-    yPosition = 60;
+    yPosition = 64;
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
