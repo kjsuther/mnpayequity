@@ -209,119 +209,178 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
           </div>
         </div>
 
-        <div className="mb-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            {complianceResult.isCompliant ? (
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            ) : complianceResult.requiresManualReview ? (
-              <AlertCircle className="w-6 h-6 text-yellow-600" />
-            ) : (
-              <XCircle className="w-6 h-6 text-red-600" />
-            )}
-            Compliance Summary
-          </h2>
-          <div className="space-y-3">
-            <div>
-              <span className="font-semibold">Status:</span>{' '}
-              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                complianceResult.isCompliant ? 'bg-green-100 text-green-800' :
-                complianceResult.requiresManualReview ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {complianceResult.isCompliant ? 'IN COMPLIANCE' : complianceResult.requiresManualReview ? 'MANUAL REVIEW REQUIRED' : 'OUT OF COMPLIANCE'}
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <span className="font-semibold">Total Job Classes:</span> {complianceResult.totalJobs}
-              </div>
-              <div>
-                <span className="font-semibold">Male-Dominated:</span> {complianceResult.maleJobs}
-              </div>
-              <div>
-                <span className="font-semibold">Female-Dominated:</span> {complianceResult.femaleJobs}
-              </div>
-            </div>
-            <p className="mt-4 text-gray-700">{complianceResult.message}</p>
+        <div className={`mb-6 p-5 rounded-xl ${
+          complianceResult.isCompliant
+            ? 'bg-emerald-50 border border-emerald-200'
+            : complianceResult.requiresManualReview
+            ? 'bg-amber-50 border border-amber-200'
+            : 'bg-rose-50 border border-rose-200'
+        }`}>
+          <p className={`text-sm leading-relaxed ${
+            complianceResult.isCompliant
+              ? 'text-emerald-800'
+              : complianceResult.requiresManualReview
+              ? 'text-amber-800'
+              : 'text-rose-800'
+          }`}>
+            {complianceResult.message}
+          </p>
+        </div>
+
+        <div className="mb-8 p-6 bg-white rounded-lg border border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">I. GENERAL JOB CLASS INFORMATION</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-gray-300 bg-gray-50">
+                  <th className="text-left py-3 px-4"></th>
+                  <th className="text-center py-3 px-4 font-bold text-gray-700">Male Classes</th>
+                  <th className="text-center py-3 px-4 font-bold text-gray-700">Female Classes</th>
+                  <th className="text-center py-3 px-4 font-bold text-gray-700">Balanced Classes</th>
+                  <th className="text-center py-3 px-4 font-bold text-gray-700">All Job Classes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-3 px-4 font-medium text-gray-700"># Job Classes</td>
+                  <td className="text-center py-3 px-4 text-gray-900">{complianceResult.generalInfo.maleClasses}</td>
+                  <td className="text-center py-3 px-4 text-gray-900">{complianceResult.generalInfo.femaleClasses}</td>
+                  <td className="text-center py-3 px-4 text-gray-900">{complianceResult.generalInfo.balancedClasses}</td>
+                  <td className="text-center py-3 px-4 font-bold text-gray-900">{complianceResult.generalInfo.totalClasses}</td>
+                </tr>
+                <tr className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-3 px-4 font-medium text-gray-700"># Employees</td>
+                  <td className="text-center py-3 px-4 text-gray-900">{complianceResult.generalInfo.maleEmployees}</td>
+                  <td className="text-center py-3 px-4 text-gray-900">{complianceResult.generalInfo.femaleEmployees}</td>
+                  <td className="text-center py-3 px-4 text-gray-900">{complianceResult.generalInfo.balancedEmployees}</td>
+                  <td className="text-center py-3 px-4 font-bold text-gray-900">{complianceResult.generalInfo.totalEmployees}</td>
+                </tr>
+                <tr className="hover:bg-gray-50">
+                  <td className="py-3 px-4 font-medium text-gray-700">Avg.Max Monthly Pay Per Employee</td>
+                  <td className="text-center py-3 px-4 text-gray-900">${complianceResult.generalInfo.avgMaxPayMale.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td className="text-center py-3 px-4 text-gray-900">${complianceResult.generalInfo.avgMaxPayFemale.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td className="text-center py-3 px-4 text-gray-900">${complianceResult.generalInfo.avgMaxPayBalanced.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td className="text-center py-3 px-4 font-bold text-gray-900">${complianceResult.generalInfo.avgMaxPayAll.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
+        {!complianceResult.requiresManualReview && complianceResult.statisticalTest && (
+          <div className="mb-8 p-6 bg-white rounded-lg border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">II. STATISTICAL ANALYSIS TEST</h2>
+
+            <div className="mb-6">
+              <h3 className="font-bold text-gray-800 mb-3">A. UNDERPAYMENT RATIO = {complianceResult.statisticalTest.underpaymentRatio.toFixed(2)}% *</h3>
+              <div className="ml-6 space-y-2 text-sm">
+                <div className="grid grid-cols-3 gap-6">
+                  <div></div>
+                  <div className="font-bold text-center text-gray-800">Male Classes</div>
+                  <div className="font-bold text-center text-gray-800">Female Classes</div>
+                </div>
+                <div className="grid grid-cols-3 gap-6 py-2">
+                  <div className="text-gray-700">a. # at or above Predicted Pay</div>
+                  <div className="text-center text-gray-900">{complianceResult.statisticalTest.maleTotalClasses - complianceResult.statisticalTest.maleClassesBelowPredicted}</div>
+                  <div className="text-center text-gray-900">{complianceResult.statisticalTest.femaleTotalClasses - complianceResult.statisticalTest.femaleClassesBelowPredicted}</div>
+                </div>
+                <div className="grid grid-cols-3 gap-6 py-2">
+                  <div className="text-gray-700">b. # Below Predicted Pay</div>
+                  <div className="text-center text-gray-900">{complianceResult.statisticalTest.maleClassesBelowPredicted}</div>
+                  <div className="text-center text-gray-900">{complianceResult.statisticalTest.femaleClassesBelowPredicted}</div>
+                </div>
+                <div className="grid grid-cols-3 gap-6 py-2">
+                  <div className="text-gray-700">c. TOTAL</div>
+                  <div className="text-center text-gray-900">{complianceResult.statisticalTest.maleTotalClasses}</div>
+                  <div className="text-center text-gray-900">{complianceResult.statisticalTest.femaleTotalClasses}</div>
+                </div>
+                <div className="grid grid-cols-3 gap-6 py-2">
+                  <div className="text-gray-700">d. % Below Predicted Pay (b divided by c = d)</div>
+                  <div className="text-center font-semibold text-gray-900">{complianceResult.statisticalTest.malePercentBelowPredicted.toFixed(2)}%</div>
+                  <div className="text-center font-semibold text-gray-900">{complianceResult.statisticalTest.femalePercentBelowPredicted.toFixed(2)}%</div>
+                </div>
+                <div className="text-xs text-gray-600 mt-3 italic">
+                  *(Result is % of male classes below predicted pay divided by % of female classes below predicted pay.)
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold text-gray-800 mb-3">B. T-test Results</h3>
+              <div className="ml-6 space-y-3 text-sm">
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="grid grid-cols-2 gap-4 text-gray-900">
+                    <div><span className="font-medium">Degrees of Freedom (DF)</span> = {complianceResult.statisticalTest.tTestDF}</div>
+                    <div><span className="font-medium">Value of T</span> = {complianceResult.statisticalTest.tTestValue.toFixed(3)}</div>
+                  </div>
+                </div>
+                <div className="text-gray-700">
+                  a. Avg.diff.in pay from predicted pay for male jobs = <span className="font-medium text-gray-900">${complianceResult.statisticalTest.avgDiffMale.toFixed(2)}</span>
+                </div>
+                <div className="text-gray-700">
+                  b. Avg.diff.in pay from predicted pay for female jobs = <span className="font-medium text-gray-900">${complianceResult.statisticalTest.avgDiffFemale.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {!complianceResult.requiresManualReview && complianceResult.salaryRangeTest && (
           <div className="mb-8 p-6 bg-white rounded-lg border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Salary Range Test (III)</h2>
-            <div className="space-y-3">
-              <div>
-                <span className="font-semibold">Status:</span>{' '}
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  complianceResult.salaryRangeTest.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {complianceResult.salaryRangeTest.passed ? 'PASSED' : 'FAILED'}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">III. SALARY RANGE TEST = {(complianceResult.salaryRangeTest.ratio * 100).toFixed(2)}% (Result is A divided by B)</h2>
+              {complianceResult.salaryRangeTest.passed ? (
+                <span className="flex items-center gap-2 text-emerald-600 text-sm font-bold px-3 py-1.5 bg-emerald-50 rounded-lg">
+                  <CheckCircle className="w-5 h-5" />
+                  Passed
                 </span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="font-semibold">Threshold:</span> {(complianceResult.salaryRangeTest.threshold * 100).toFixed(2)}%
-                </div>
-                <div>
-                  <span className="font-semibold">Result:</span> {(complianceResult.salaryRangeTest.ratio * 100).toFixed(2)}%
-                </div>
-                <div>
-                  <span className="font-semibold">Male Average Years to Max:</span> {complianceResult.salaryRangeTest.maleAverage.toFixed(2)}
-                </div>
-                <div>
-                  <span className="font-semibold">Female Average Years to Max:</span> {complianceResult.salaryRangeTest.femaleAverage.toFixed(2)}
-                </div>
-              </div>
+              ) : (
+                <span className="flex items-center gap-2 text-rose-600 text-sm font-bold px-3 py-1.5 bg-rose-50 rounded-lg">
+                  <XCircle className="w-5 h-5" />
+                  Failed
+                </span>
+              )}
+            </div>
+            <div className="space-y-3 text-sm ml-6">
+              <p className="text-gray-700">
+                A. Avg.# of years to max salary for male jobs = <span className="font-semibold text-gray-900">{complianceResult.salaryRangeTest.maleAverage.toFixed(2)}</span>
+              </p>
+              <p className="text-gray-700">
+                B. Avg.# of years to max salary for female jobs = <span className="font-semibold text-gray-900">{complianceResult.salaryRangeTest.femaleAverage.toFixed(2)}</span>
+              </p>
             </div>
           </div>
         )}
 
         {!complianceResult.requiresManualReview && complianceResult.exceptionalServiceTest && (
           <div className="mb-8 p-6 bg-white rounded-lg border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Exceptional Service Pay Test (IV)</h2>
-            <div className="space-y-3">
-              <div>
-                <span className="font-semibold">Status:</span>{' '}
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  complianceResult.exceptionalServiceTest.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {complianceResult.exceptionalServiceTest.passed ? 'PASSED' : 'FAILED'}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">IV. EXCEPTIONAL SERVICE PAY TEST = {(complianceResult.exceptionalServiceTest.ratio * 100).toFixed(2)}% (Result is B divided by A)</h2>
+              {complianceResult.exceptionalServiceTest.passed ? (
+                <span className="flex items-center gap-2 text-emerald-600 text-sm font-bold px-3 py-1.5 bg-emerald-50 rounded-lg">
+                  <CheckCircle className="w-5 h-5" />
+                  Passed
                 </span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="font-semibold">Threshold:</span> {(complianceResult.exceptionalServiceTest.threshold * 100).toFixed(2)}%
-                </div>
-                <div>
-                  <span className="font-semibold">Result:</span> {(complianceResult.exceptionalServiceTest.ratio * 100).toFixed(2)}%
-                </div>
-                <div>
-                  <span className="font-semibold">Male Classes with Exceptional Service:</span> {complianceResult.exceptionalServiceTest.malePercentage.toFixed(2)}%
-                </div>
-                <div>
-                  <span className="font-semibold">Female Classes with Exceptional Service:</span> {complianceResult.exceptionalServiceTest.femalePercentage.toFixed(2)}%
-                </div>
-              </div>
+              ) : (
+                <span className="flex items-center gap-2 text-rose-600 text-sm font-bold px-3 py-1.5 bg-rose-50 rounded-lg">
+                  <XCircle className="w-5 h-5" />
+                  Failed
+                </span>
+              )}
+            </div>
+            <div className="space-y-3 text-sm ml-6">
+              <p className="text-gray-700">
+                A. % of male classes receiving ESP = <span className="font-semibold text-gray-900">{complianceResult.exceptionalServiceTest.malePercentage.toFixed(2)}%</span>
+              </p>
+              <p className="text-gray-700">
+                B. % of female classes receiving ESP = <span className="font-semibold text-gray-900">{complianceResult.exceptionalServiceTest.femalePercentage.toFixed(2)}%</span>
+              </p>
+              <p className="text-xs text-gray-600 mt-3 italic">
+                *(If 20% or less, test result will be 0.00)
+              </p>
             </div>
           </div>
         )}
-
-        <div className="p-6 bg-white rounded-lg border border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Job Classifications</h2>
-          <div className="space-y-4">
-            {jobs.map((job) => (
-              <div key={job.id} className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-2">Job #{job.job_number}: {job.title}</h3>
-                <div className="text-sm text-gray-600 space-y-1">
-                  <p>Males: {job.males} | Females: {job.females} | Points: {job.points}</p>
-                  <p>Salary Range: ${job.min_salary.toLocaleString()} - ${job.max_salary.toLocaleString()}</p>
-                  <p>Years to Max: {job.years_to_max} | Years Service Pay: {job.years_service_pay}</p>
-                  <p>Exceptional Service: {job.exceptional_service_category || 'None'}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
