@@ -84,7 +84,7 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
 
     doc.setFillColor(255, 255, 255);
     doc.setDrawColor(200, 200, 200);
-    doc.rect(15, yPosition, pageWidth - 30, 90, 'FD');
+    doc.rect(20, yPosition, pageWidth - 40, 90, 'FD');
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.text('I. GENERAL JOB CLASS INFORMATION', 20, yPosition + 18);
@@ -133,7 +133,7 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       doc.setFillColor(255, 255, 255);
       doc.setDrawColor(200, 200, 200);
       const sectionHeight = 180;
-      doc.rect(15, yPosition, pageWidth - 30, sectionHeight, 'FD');
+      doc.rect(20, yPosition, pageWidth - 40, sectionHeight, 'FD');
 
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
@@ -205,7 +205,7 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
 
       doc.setFillColor(255, 255, 255);
       doc.setDrawColor(200, 200, 200);
-      doc.rect(15, yPosition, pageWidth - 30, 70, 'FD');
+      doc.rect(20, yPosition, pageWidth - 40, 70, 'FD');
 
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
@@ -237,7 +237,7 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
 
       doc.setFillColor(255, 255, 255);
       doc.setDrawColor(200, 200, 200);
-      doc.rect(15, yPosition, pageWidth - 30, 75, 'FD');
+      doc.rect(20, yPosition, pageWidth - 40, 75, 'FD');
 
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
