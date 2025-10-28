@@ -1,9 +1,11 @@
-import { ArrowLeft, FileDown, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, FileDown, CheckCircle, XCircle, AlertCircle, BookOpen } from 'lucide-react';
 import { Report, JobClassification, Jurisdiction } from '../lib/supabase';
 import { ComplianceResult } from '../lib/complianceAnalysis';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { addLogoToPDF, addPageNumbers, formatCurrency, formatNumber } from '../lib/pdfGenerator';
+import { ComplianceReportGuide } from './ComplianceReportGuide';
 
 type ComplianceReportPageProps = {
   report: Report;
@@ -14,6 +16,19 @@ type ComplianceReportPageProps = {
 };
 
 export function ComplianceReportPage({ report, jurisdiction, jobs, complianceResult, onBack }: ComplianceReportPageProps) {
+  const [showGuide, setShowGuide] = useState(false);
+
+  if (showGuide) {
+    return (
+      <ComplianceReportGuide
+        report={report}
+        jurisdiction={jurisdiction}
+        complianceResult={complianceResult}
+        onBack={() => setShowGuide(false)}
+      />
+    );
+  }
+
   async function exportToPDF() {
     const doc = new jsPDF('portrait', 'pt', 'letter');
     const pageWidth = doc.internal.pageSize.width;
@@ -287,13 +302,22 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
           <ArrowLeft className="w-5 h-5" />
           Back to Reports
         </button>
-        <button
-          onClick={exportToPDF}
-          className="flex items-center gap-2 px-6 py-3 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors font-medium"
-        >
-          <FileDown className="w-5 h-5" />
-          Export to PDF
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowGuide(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-white border border-[#003865] text-[#003865] rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
+            <BookOpen className="w-5 h-5" />
+            Help Guide
+          </button>
+          <button
+            onClick={exportToPDF}
+            className="flex items-center gap-2 px-6 py-3 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors font-medium"
+          >
+            <FileDown className="w-5 h-5" />
+            Export to PDF
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
