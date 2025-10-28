@@ -3,6 +3,9 @@ import { ArrowLeft, Edit, Trash2, Plus, Download, Eye, FileEdit, RotateCcw } fro
 import { supabase, type Jurisdiction, type Report, type JobClassification } from '../lib/supabase';
 import { EditCaseDescriptionModal } from './EditCaseDescriptionModal';
 import { AddJobModal } from './AddJobModal';
+import { JobEntryMethodModal } from './JobEntryMethodModal';
+import { CopyJobsModal } from './CopyJobsModal';
+import { ImportJobsModal } from './ImportJobsModal';
 
 type JobsPageProps = {
   jurisdiction: Jurisdiction;
@@ -19,6 +22,9 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
   const [isEditCaseModalOpen, setIsEditCaseModalOpen] = useState(false);
   const [editingReport, setEditingReport] = useState<Report | null>(null);
   const [isAddJobModalOpen, setIsAddJobModalOpen] = useState(false);
+  const [isJobEntryMethodModalOpen, setIsJobEntryMethodModalOpen] = useState(false);
+  const [isCopyJobsModalOpen, setIsCopyJobsModalOpen] = useState(false);
+  const [isImportJobsModalOpen, setIsImportJobsModalOpen] = useState(false);
 
   useEffect(() => {
     loadReports();
@@ -286,6 +292,51 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
     return Math.max(...jobs.map(j => j.job_number)) + 1;
   }
 
+  function handleJobEntryMethodSelect(method: 'manual' | 'copy' | 'import' | 'none') {
+    setIsJobEntryMethodModalOpen(false);
+
+    if (method === 'manual') {
+      setIsAddJobModalOpen(true);
+    } else if (method === 'copy') {
+      setIsCopyJobsModalOpen(true);
+    } else if (method === 'import') {
+      setIsImportJobsModalOpen(true);
+    } else if (method === 'none') {
+      handleNoJobsToReport();
+    }
+  }
+
+  async function handleNoJobsToReport() {
+    if (!selectedReport) return;
+
+    const confirmed = confirm(
+      'This option indicates that your jurisdiction has no employees who work 67 days or more per year AND at least 14 hours per week (100 days for students).\n\nThis will update the case status.\n\nContinue?'
+    );
+
+    if (!confirmed) {
+      setIsJobEntryMethodModalOpen(true);
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('reports')
+        .update({
+          case_status: 'No Jobs To Report',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedReport.id);
+
+      if (error) throw error;
+
+      alert('Case updated: No jobs to report');
+      await loadReports();
+    } catch (error) {
+      console.error('Error updating report:', error);
+      alert('Error updating report. Please try again.');
+    }
+  }
+
   async function handleAddJob(newJob: Partial<JobClassification>) {
     if (!selectedReport) return;
 
@@ -320,6 +371,83 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
     } catch (error) {
       console.error('Error adding job:', error);
       alert('Error adding job. Please try again.');
+    }
+  }
+
+  async function handleCopyJobs(sourceReportId: string) {
+    if (!selectedReport) return;
+
+    try {
+      const { data: sourceJobs, error: fetchError } = await supabase
+        .from('job_classifications')
+        .select('*')
+        .eq('report_id', sourceReportId)
+        .order('job_number');
+
+      if (fetchError) throw fetchError;
+
+      if (sourceJobs && sourceJobs.length > 0) {
+        const startingJobNumber = getNextJobNumber();
+        const jobsToInsert = sourceJobs.map((job, index) => ({
+          report_id: selectedReport.id,
+          job_number: startingJobNumber + index,
+          title: job.title,
+          males: job.males,
+          females: job.females,
+          nonbinary: job.nonbinary || 0,
+          points: job.points,
+          min_salary: job.min_salary,
+          max_salary: job.max_salary,
+          years_to_max: job.years_to_max,
+          years_service_pay: job.years_service_pay,
+          exceptional_service_category: job.exceptional_service_category,
+          benefits_included_in_salary: 0,
+          is_part_time: false,
+          hours_per_week: null,
+          days_per_year: null,
+          additional_cash_compensation: 0,
+        }));
+
+        const { error: insertError } = await supabase
+          .from('job_classifications')
+          .insert(jobsToInsert);
+
+        if (insertError) throw insertError;
+
+        alert(`Successfully copied ${sourceJobs.length} job classifications`);
+        await loadJobs(selectedReport.id);
+      }
+    } catch (error) {
+      console.error('Error copying jobs:', error);
+      alert('Error copying jobs. Please try again.');
+    }
+  }
+
+  async function handleImportJobs(jobs: any[]) {
+    if (!selectedReport) return;
+
+    try {
+      const jobsToInsert = jobs.map((job) => ({
+        report_id: selectedReport.id,
+        ...job,
+        benefits_included_in_salary: job.benefits_included_in_salary || 0,
+        is_part_time: job.is_part_time || false,
+        hours_per_week: job.hours_per_week || null,
+        days_per_year: job.days_per_year || null,
+        additional_cash_compensation: job.additional_cash_compensation || 0,
+      }));
+
+      const { error } = await supabase
+        .from('job_classifications')
+        .insert(jobsToInsert);
+
+      if (error) throw error;
+
+      alert(`Successfully imported ${jobs.length} job classifications`);
+      await loadJobs(selectedReport.id);
+    } catch (error) {
+      console.error('Error importing jobs:', error);
+      alert('Error importing jobs. Please try again.');
     }
   }
 
@@ -541,14 +669,20 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
 
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
             <button
-              onClick={() => setIsAddJobModalOpen(true)}
+              onClick={() => setIsJobEntryMethodModalOpen(true)}
               className="flex items-center gap-2 px-4 py-2 bg-[#78BE21] text-white rounded-lg hover:bg-[#6ba51c] transition-colors text-sm font-medium shadow-sm"
             >
               <Plus size={18} />
-              Add New Job
+              Add Job
             </button>
           </div>
         </div>
+
+        <JobEntryMethodModal
+          isOpen={isJobEntryMethodModalOpen}
+          onClose={() => setIsJobEntryMethodModalOpen(false)}
+          onSelectMethod={handleJobEntryMethodSelect}
+        />
 
         <AddJobModal
           isOpen={isAddJobModalOpen}
@@ -556,6 +690,20 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
           nextJobNumber={getNextJobNumber()}
           onClose={() => setIsAddJobModalOpen(false)}
           onSave={handleAddJob}
+        />
+
+        <CopyJobsModal
+          isOpen={isCopyJobsModalOpen}
+          currentReportId={selectedReport.id}
+          jurisdictionId={jurisdiction.id}
+          onClose={() => setIsCopyJobsModalOpen(false)}
+          onCopy={handleCopyJobs}
+        />
+
+        <ImportJobsModal
+          isOpen={isImportJobsModalOpen}
+          onClose={() => setIsImportJobsModalOpen(false)}
+          onImport={handleImportJobs}
         />
       </div>
     );
