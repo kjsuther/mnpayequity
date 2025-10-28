@@ -17,9 +17,10 @@ type ReportManagementProps = {
   selectedReport?: Report | null;
   onBack: () => void;
   onNavigateToReportView?: (reportType: 'jobDataEntry' | 'compliance' | 'predictedPay' | 'implementation') => void;
+  onReportSelect?: (report: Report | null) => void;
 };
 
-export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavigateToReportView }: ReportManagementProps) {
+export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavigateToReportView, onReportSelect }: ReportManagementProps) {
   const [reports, setReports] = useState<Report[]>([]);
   const [currentReport, setCurrentReport] = useState<Report | null>(null);
   const [jobs, setJobs] = useState<JobClassification[]>([]);
@@ -138,6 +139,9 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
       await loadReports();
       if (data) {
         setCurrentReport(data);
+        if (onReportSelect) {
+          onReportSelect(data);
+        }
       }
     } catch (error) {
       console.error('Error creating report:', error);
@@ -229,12 +233,18 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
 
   function handleViewReport(report: Report) {
     setCurrentReport(report);
+    if (onReportSelect) {
+      onReportSelect(report);
+    }
   }
 
   function handleBackToList() {
     setCurrentReport(null);
     setShowJobOptions(false);
     setEntryMethod(null);
+    if (onReportSelect) {
+      onReportSelect(null);
+    }
   }
 
   function handleEntryMethod(method: string) {

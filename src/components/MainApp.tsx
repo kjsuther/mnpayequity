@@ -443,6 +443,7 @@ export function MainApp() {
               setCurrentView('home');
             }}
             onNavigateToReportView={handleNavigateToReportView}
+            onReportSelect={(report) => setSelectedReport(report)}
           />
         ) : currentView === 'reportView' && currentJurisdiction && selectedReport && reportViewType ? (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
