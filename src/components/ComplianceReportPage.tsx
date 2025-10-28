@@ -83,14 +83,6 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
     yPosition += 35;
 
     const section1Start = yPosition;
-    const tableHeight = (3 + 1) * (9 + 10) + 10;
-    const section1Height = 25 + tableHeight;
-
-    doc.setFillColor(255, 255, 255);
-    doc.setDrawColor(200, 200, 200);
-    doc.setLineWidth(1);
-    doc.rect(20, section1Start, pageWidth - 40, section1Height, 'S');
-
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.text('I. GENERAL JOB CLASS INFORMATION', 25, section1Start + 18);
@@ -128,7 +120,12 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       }
     });
 
-    yPosition = (doc as any).lastAutoTable.finalY + 20;
+    const section1End = (doc as any).lastAutoTable.finalY + 10;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(1);
+    doc.rect(20, section1Start, pageWidth - 40, section1End - section1Start, 'S');
+
+    yPosition = section1End + 10;
 
     if (!complianceResult.requiresManualReview && complianceResult.statisticalTest) {
       if (yPosition > 600) {
@@ -137,13 +134,6 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       }
 
       const section2Start = yPosition;
-      const section2Height = 175;
-
-      doc.setFillColor(255, 255, 255);
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(1);
-      doc.rect(20, section2Start, pageWidth - 40, section2Height, 'S');
-
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.text('II. STATISTICAL ANALYSIS TEST', 25, yPosition + 18);
@@ -203,7 +193,12 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       testYPos += 10;
       doc.text(`b. Avg.diff.in pay from predicted pay for female jobs = $${complianceResult.statisticalTest.avgDiffFemale.toFixed(2)}`, 50, testYPos);
 
-      yPosition = section2Start + section2Height + 10;
+      const section2End = testYPos + 10;
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(1);
+      doc.rect(20, section2Start, pageWidth - 40, section2End - section2Start, 'S');
+
+      yPosition = section2End + 10;
     }
 
     if (!complianceResult.requiresManualReview && complianceResult.salaryRangeTest) {
@@ -213,13 +208,6 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       }
 
       const section3Start = yPosition;
-      const section3Height = 62;
-
-      doc.setFillColor(255, 255, 255);
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(1);
-      doc.rect(20, section3Start, pageWidth - 40, section3Height, 'S');
-
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
@@ -239,7 +227,12 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       doc.text(`A. Avg.# of years to max salary for male jobs = ${complianceResult.salaryRangeTest.maleAverage.toFixed(2)}`, 30, yPosition + 38);
       doc.text(`B. Avg.# of years to max salary for female jobs = ${complianceResult.salaryRangeTest.femaleAverage.toFixed(2)}`, 30, yPosition + 52);
 
-      yPosition = section3Start + section3Height + 10;
+      const section3End = yPosition + 62;
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(1);
+      doc.rect(20, section3Start, pageWidth - 40, section3End - section3Start, 'S');
+
+      yPosition = section3End + 10;
     }
 
     if (!complianceResult.requiresManualReview && complianceResult.exceptionalServiceTest) {
@@ -249,13 +242,6 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       }
 
       const section4Start = yPosition;
-      const section4Height = 75;
-
-      doc.setFillColor(255, 255, 255);
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(1);
-      doc.rect(20, section4Start, pageWidth - 40, section4Height, 'S');
-
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
@@ -278,7 +264,12 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       doc.setFontSize(8);
       doc.text('*(If 20% or less, test result will be 0.00)', 30, yPosition + 65);
 
-      yPosition = section4Start + section4Height + 10;
+      const section4End = yPosition + 75;
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(1);
+      doc.rect(20, section4Start, pageWidth - 40, section4End - section4Start, 'S');
+
+      yPosition = section4End + 10;
     }
 
     addPageNumbers(doc);
