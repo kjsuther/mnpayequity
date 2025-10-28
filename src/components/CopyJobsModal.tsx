@@ -18,12 +18,17 @@ export function CopyJobsModal({
   onCopy,
 }: CopyJobsModalProps) {
   const [reports, setReports] = useState<Report[]>([]);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number | ''>('');
   const [selectedReportId, setSelectedReportId] = useState('');
   const [isCopying, setIsCopying] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       loadReports();
+    } else {
+      setSelectedYear('');
+      setSelectedReportId('');
     }
   }, [isOpen, jurisdictionId]);
 
@@ -34,14 +39,27 @@ export function CopyJobsModal({
         .select('*')
         .eq('jurisdiction_id', jurisdictionId)
         .neq('id', currentReportId)
-        .order('report_year', { ascending: false });
+        .order('report_year', { ascending: false })
+        .order('case_number', { ascending: false });
 
       if (error) throw error;
+
       setReports(data || []);
+
+      const years = [...new Set((data || []).map(r => r.report_year))].sort((a, b) => b - a);
+      setAvailableYears(years);
+
+      if (years.length > 0 && !selectedYear) {
+        setSelectedYear(years[0]);
+      }
     } catch (error) {
       console.error('Error loading reports:', error);
     }
   }
+
+  const filteredReports = selectedYear
+    ? reports.filter(r => r.report_year === selectedYear)
+    : reports;
 
   const handleCopy = async () => {
     if (!selectedReportId) {
@@ -52,6 +70,8 @@ export function CopyJobsModal({
     setIsCopying(true);
     try {
       await onCopy(selectedReportId);
+      setSelectedYear('');
+      setSelectedReportId('');
       onClose();
     } catch (error) {
       console.error('Error copying jobs:', error);
@@ -59,6 +79,11 @@ export function CopyJobsModal({
     } finally {
       setIsCopying(false);
     }
+  };
+
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year ? parseInt(year) : '');
+    setSelectedReportId('');
   };
 
   if (!isOpen) return null;
@@ -85,28 +110,50 @@ export function CopyJobsModal({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Report to Copy From
+                  Report Year
                 </label>
                 <select
-                  value={selectedReportId}
-                  onChange={(e) => setSelectedReportId(e.target.value)}
+                  value={selectedYear}
+                  onChange={(e) => handleYearChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#003865] focus:border-transparent"
                 >
-                  <option value="">-- Select a Report --</option>
-                  {reports.map((report) => (
-                    <option key={report.id} value={report.id}>
-                      {report.report_year} - Case {report.case_number}: {report.case_description}
+                  <option value="">-- Select a Year --</option>
+                  {availableYears.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
-                  All job classifications from the selected report will be copied to the current report.
-                  You can edit them after copying.
-                </p>
-              </div>
+              {selectedYear && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Report to Copy From
+                  </label>
+                  <select
+                    value={selectedReportId}
+                    onChange={(e) => setSelectedReportId(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                  >
+                    <option value="">-- Select a Report --</option>
+                    {filteredReports.map((report) => (
+                      <option key={report.id} value={report.id}>
+                        {report.report_year} - Case {report.case_number}: {report.case_description}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {selectedYear && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    All job classifications from the selected report will be copied to the current report.
+                    You can edit them after copying.
+                  </p>
+                </div>
+              )}
 
               <div className="flex gap-3 pt-2">
                 <button
