@@ -2,6 +2,7 @@ import { ArrowLeft, FileDown, CheckCircle, XCircle, AlertCircle } from 'lucide-r
 import { Report, JobClassification, Jurisdiction } from '../lib/supabase';
 import { ComplianceResult } from '../lib/complianceAnalysis';
 import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { addLogoToPDF, addPageNumbers, formatCurrency, formatNumber } from '../lib/pdfGenerator';
 
 type ComplianceReportPageProps = {
@@ -15,142 +16,236 @@ type ComplianceReportPageProps = {
 export function ComplianceReportPage({ report, jurisdiction, jobs, complianceResult, onBack }: ComplianceReportPageProps) {
   async function exportToPDF() {
     const doc = new jsPDF('portrait', 'pt', 'letter');
+    const pageWidth = doc.internal.pageSize.width;
     let yPosition = 30;
 
     await addLogoToPDF(doc, '/MMB_logo copy copy copy.jpg');
 
     yPosition = 35;
-    doc.setFontSize(18);
+    doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
-    doc.text('PAY EQUITY COMPLIANCE REPORT', 15, yPosition);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Pay Equity Compliance Report', 15, yPosition);
 
     yPosition += 20;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text(jurisdiction.name, 15, yPosition);
-    yPosition += 15;
-
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    doc.text(jurisdiction.name, 15, yPosition);
+    yPosition += 12;
+    doc.setFontSize(9);
     doc.text(`Report Year: ${report.report_year}`, 15, yPosition);
-    yPosition += 12;
+    yPosition += 10;
     doc.text(`Case: ${report.case_number} - ${report.case_description}`, 15, yPosition);
-    yPosition += 12;
+    yPosition += 10;
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 15, yPosition);
     yPosition += 25;
 
+    doc.setFillColor(245, 245, 245);
+    doc.rect(15, yPosition - 10, pageWidth - 30, 70, 'F');
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text('JURISDICTION INFORMATION', 15, yPosition);
-    yPosition += 15;
+    doc.text('Jurisdiction Information', 20, yPosition + 5);
 
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Name: ${jurisdiction.name}`, 15, yPosition);
-    yPosition += 12;
-    doc.text(`Type: ${jurisdiction.jurisdiction_type}`, 15, yPosition);
-    yPosition += 12;
-    doc.text(`Address: ${jurisdiction.address}`, 15, yPosition);
-    yPosition += 12;
-    doc.text(`City: ${jurisdiction.city}, ${jurisdiction.state} ${jurisdiction.zipcode}`, 15, yPosition);
-    yPosition += 12;
-    doc.text(`Phone: ${jurisdiction.phone}`, 15, yPosition);
-    yPosition += 25;
+    doc.text(`Name: ${jurisdiction.name}`, 20, yPosition + 20);
+    doc.text(`Type: ${jurisdiction.jurisdiction_type}`, 320, yPosition + 20);
+    doc.text(`Address: ${jurisdiction.address}`, 20, yPosition + 33);
+    doc.text(`City: ${jurisdiction.city}, ${jurisdiction.state} ${jurisdiction.zipcode}`, 320, yPosition + 33);
+    doc.text(`Phone: ${jurisdiction.phone}`, 20, yPosition + 46);
+    yPosition += 85;
 
+    const statusColor = complianceResult.isCompliant ? [209, 250, 229] :
+                        complianceResult.requiresManualReview ? [254, 243, 199] : [254, 226, 226];
+    doc.setFillColor(statusColor[0], statusColor[1], statusColor[2]);
+    doc.rect(15, yPosition - 5, pageWidth - 30, 25, 'F');
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(9);
+    const lines = doc.splitTextToSize(complianceResult.message, pageWidth - 50);
+    doc.text(lines, 20, yPosition + 8);
+    yPosition += 35;
+
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(200, 200, 200);
+    doc.rect(15, yPosition, pageWidth - 30, 90, 'FD');
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text('COMPLIANCE SUMMARY', 15, yPosition);
-    yPosition += 15;
+    doc.text('I. GENERAL JOB CLASS INFORMATION', 20, yPosition + 18);
 
-    doc.setFont('helvetica', 'normal');
-    const status = complianceResult.isCompliant ? 'IN COMPLIANCE' : complianceResult.requiresManualReview ? 'MANUAL REVIEW REQUIRED' : 'OUT OF COMPLIANCE';
-    doc.text(`Status: ${status}`, 15, yPosition);
-    yPosition += 12;
-    doc.text(`Total Job Classes: ${complianceResult.totalJobs}`, 15, yPosition);
-    yPosition += 12;
-    doc.text(`Male-Dominated Classes: ${complianceResult.maleJobs}`, 15, yPosition);
-    yPosition += 12;
-    doc.text(`Female-Dominated Classes: ${complianceResult.femaleJobs}`, 15, yPosition);
-    yPosition += 15;
+    autoTable(doc, {
+      startY: yPosition + 25,
+      margin: { left: 20, right: 20 },
+      head: [['', 'Male Classes', 'Female Classes', 'Balanced Classes', 'All Job Classes']],
+      body: [
+        ['# Job Classes',
+         complianceResult.generalInfo.maleClasses.toString(),
+         complianceResult.generalInfo.femaleClasses.toString(),
+         complianceResult.generalInfo.balancedClasses.toString(),
+         complianceResult.generalInfo.totalClasses.toString()],
+        ['# Employees',
+         complianceResult.generalInfo.maleEmployees.toString(),
+         complianceResult.generalInfo.femaleEmployees.toString(),
+         complianceResult.generalInfo.balancedEmployees.toString(),
+         complianceResult.generalInfo.totalEmployees.toString()],
+        ['Avg.Max Monthly Pay Per Employee',
+         `$${formatCurrency(complianceResult.generalInfo.avgMaxPayMale)}`,
+         `$${formatCurrency(complianceResult.generalInfo.avgMaxPayFemale)}`,
+         `$${formatCurrency(complianceResult.generalInfo.avgMaxPayBalanced)}`,
+         `$${formatCurrency(complianceResult.generalInfo.avgMaxPayAll)}`]
+      ],
+      theme: 'plain',
+      styles: { fontSize: 9, cellPadding: 5 },
+      headStyles: { fillColor: [249, 250, 251], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center' },
+      columnStyles: {
+        0: { fontStyle: 'bold', cellWidth: 180 },
+        1: { halign: 'center' },
+        2: { halign: 'center' },
+        3: { halign: 'center' },
+        4: { halign: 'center', fontStyle: 'bold' }
+      }
+    });
 
-    const lines = doc.splitTextToSize(complianceResult.message, 550);
-    doc.text(lines, 15, yPosition);
-    yPosition += lines.length * 12 + 15;
+    yPosition = (doc as any).lastAutoTable.finalY + 20;
 
-    if (!complianceResult.requiresManualReview && complianceResult.salaryRangeTest) {
-      if (yPosition > 700) {
+    if (!complianceResult.requiresManualReview && complianceResult.statisticalTest) {
+      if (yPosition > 600) {
         doc.addPage();
         yPosition = 30;
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.text('SALARY RANGE TEST (III)', 15, yPosition);
-      yPosition += 15;
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(200, 200, 200);
+      const sectionHeight = 180;
+      doc.rect(15, yPosition, pageWidth - 30, sectionHeight, 'FD');
 
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('II. STATISTICAL ANALYSIS TEST', 20, yPosition + 18);
+
+      doc.setFontSize(10);
+      doc.text(`A. UNDERPAYMENT RATIO = ${complianceResult.statisticalTest.underpaymentRatio.toFixed(2)}% *`, 25, yPosition + 38);
+
+      autoTable(doc, {
+        startY: yPosition + 48,
+        margin: { left: 50, right: 50 },
+        head: [['', 'Male Classes', 'Female Classes']],
+        body: [
+          ['a. # at or above Predicted Pay',
+           (complianceResult.statisticalTest.maleTotalClasses - complianceResult.statisticalTest.maleClassesBelowPredicted).toString(),
+           (complianceResult.statisticalTest.femaleTotalClasses - complianceResult.statisticalTest.femaleClassesBelowPredicted).toString()],
+          ['b. # Below Predicted Pay',
+           complianceResult.statisticalTest.maleClassesBelowPredicted.toString(),
+           complianceResult.statisticalTest.femaleClassesBelowPredicted.toString()],
+          ['c. TOTAL',
+           complianceResult.statisticalTest.maleTotalClasses.toString(),
+           complianceResult.statisticalTest.femaleTotalClasses.toString()],
+          ['d. % Below Predicted Pay (b divided by c = d)',
+           `${complianceResult.statisticalTest.malePercentBelowPredicted.toFixed(2)}%`,
+           `${complianceResult.statisticalTest.femalePercentBelowPredicted.toFixed(2)}%`]
+        ],
+        theme: 'plain',
+        styles: { fontSize: 8, cellPadding: 3 },
+        headStyles: { fillColor: [249, 250, 251], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center' },
+        columnStyles: {
+          0: { cellWidth: 200 },
+          1: { halign: 'center' },
+          2: { halign: 'center' }
+        }
+      });
+
+      let testYPos = (doc as any).lastAutoTable.finalY + 8;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'italic');
+      doc.text('*(Result is % of male classes below predicted pay divided by % of female classes below predicted pay.)', 50, testYPos);
+
+      testYPos += 15;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text('B. T-test Results', 25, testYPos);
+
+      testYPos += 12;
+      doc.setFillColor(249, 250, 251);
+      doc.rect(50, testYPos - 8, pageWidth - 100, 18, 'F');
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Status: ${complianceResult.salaryRangeTest.passed ? 'PASSED' : 'FAILED'}`, 15, yPosition);
-      yPosition += 12;
-      doc.text(`Threshold: ${(complianceResult.salaryRangeTest.threshold * 100).toFixed(2)}%`, 15, yPosition);
-      yPosition += 12;
-      doc.text(`Result: ${(complianceResult.salaryRangeTest.ratio * 100).toFixed(2)}%`, 15, yPosition);
-      yPosition += 15;
-      doc.text(`Male Average Years to Max: ${complianceResult.salaryRangeTest.maleAverage.toFixed(2)}`, 15, yPosition);
-      yPosition += 12;
-      doc.text(`Female Average Years to Max: ${complianceResult.salaryRangeTest.femaleAverage.toFixed(2)}`, 15, yPosition);
-      yPosition += 25;
+      doc.text(`Degrees of Freedom (DF) = ${complianceResult.statisticalTest.tTestDF}`, 55, testYPos + 4);
+      doc.text(`Value of T = ${complianceResult.statisticalTest.tTestValue.toFixed(3)}`, 320, testYPos + 4);
+
+      testYPos += 22;
+      doc.setFontSize(8);
+      doc.text(`a. Avg.diff.in pay from predicted pay for male jobs = $${complianceResult.statisticalTest.avgDiffMale.toFixed(2)}`, 50, testYPos);
+      testYPos += 10;
+      doc.text(`b. Avg.diff.in pay from predicted pay for female jobs = $${complianceResult.statisticalTest.avgDiffFemale.toFixed(2)}`, 50, testYPos);
+
+      yPosition += sectionHeight + 20;
+    }
+
+    if (!complianceResult.requiresManualReview && complianceResult.salaryRangeTest) {
+      if (yPosition > 650) {
+        doc.addPage();
+        yPosition = 30;
+      }
+
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(200, 200, 200);
+      doc.rect(15, yPosition, pageWidth - 30, 70, 'FD');
+
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(0, 0, 0);
+      doc.text(`III. SALARY RANGE TEST = ${(complianceResult.salaryRangeTest.ratio * 100).toFixed(2)}% (Result is A divided by B)`, 20, yPosition + 18);
+
+      if (complianceResult.salaryRangeTest.passed) {
+        doc.setTextColor(16, 185, 129);
+        doc.text('Passed', pageWidth - 70, yPosition + 18);
+      } else {
+        doc.setTextColor(239, 68, 68);
+        doc.text('Failed', pageWidth - 70, yPosition + 18);
+      }
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`A. Avg.# of years to max salary for male jobs = ${complianceResult.salaryRangeTest.maleAverage.toFixed(2)}`, 30, yPosition + 38);
+      doc.text(`B. Avg.# of years to max salary for female jobs = ${complianceResult.salaryRangeTest.femaleAverage.toFixed(2)}`, 30, yPosition + 52);
+
+      yPosition += 90;
     }
 
     if (!complianceResult.requiresManualReview && complianceResult.exceptionalServiceTest) {
-      if (yPosition > 700) {
+      if (yPosition > 650) {
         doc.addPage();
         yPosition = 30;
       }
 
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(200, 200, 200);
+      doc.rect(15, yPosition, pageWidth - 30, 75, 'FD');
+
+      doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.text('EXCEPTIONAL SERVICE PAY TEST (IV)', 15, yPosition);
-      yPosition += 15;
+      doc.setTextColor(0, 0, 0);
+      doc.text(`IV. EXCEPTIONAL SERVICE PAY TEST = ${(complianceResult.exceptionalServiceTest.ratio * 100).toFixed(2)}% (Result is B divided by A)`, 20, yPosition + 18);
 
-      doc.setFont('helvetica', 'normal');
-      doc.text(`Status: ${complianceResult.exceptionalServiceTest.passed ? 'PASSED' : 'FAILED'}`, 15, yPosition);
-      yPosition += 12;
-      doc.text(`Threshold: ${(complianceResult.exceptionalServiceTest.threshold * 100).toFixed(2)}%`, 15, yPosition);
-      yPosition += 12;
-      doc.text(`Result: ${(complianceResult.exceptionalServiceTest.ratio * 100).toFixed(2)}%`, 15, yPosition);
-      yPosition += 15;
-      doc.text(`Male Classes with Exceptional Service: ${complianceResult.exceptionalServiceTest.malePercentage.toFixed(2)}%`, 15, yPosition);
-      yPosition += 12;
-      doc.text(`Female Classes with Exceptional Service: ${complianceResult.exceptionalServiceTest.femalePercentage.toFixed(2)}%`, 15, yPosition);
-      yPosition += 25;
-    }
-
-    if (yPosition > 650) {
-      doc.addPage();
-      yPosition = 30;
-    }
-
-    doc.setFont('helvetica', 'bold');
-    doc.text('JOB CLASSIFICATIONS', 15, yPosition);
-    yPosition += 15;
-
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    jobs.forEach((job) => {
-      if (yPosition > 730) {
-        doc.addPage();
-        yPosition = 30;
+      if (complianceResult.exceptionalServiceTest.passed) {
+        doc.setTextColor(16, 185, 129);
+        doc.text('Passed', pageWidth - 70, yPosition + 18);
+      } else {
+        doc.setTextColor(239, 68, 68);
+        doc.text('Failed', pageWidth - 70, yPosition + 18);
       }
 
-      doc.setFont('helvetica', 'bold');
-      doc.text(`Job #${job.job_number}: ${job.title}`, 15, yPosition);
-      yPosition += 10;
-
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
-      doc.text(`  Males: ${job.males} | Females: ${job.females} | Points: ${job.points}`, 15, yPosition);
-      yPosition += 10;
-      doc.text(`  Salary Range: $${job.min_salary.toLocaleString()} - $${job.max_salary.toLocaleString()}`, 15, yPosition);
-      yPosition += 10;
-      doc.text(`  Years to Max: ${job.years_to_max} | Years Service Pay: ${job.years_service_pay}`, 15, yPosition);
-      yPosition += 10;
-      doc.text(`  Exceptional Service: ${job.exceptional_service_category || 'None'}`, 15, yPosition);
-      yPosition += 15;
-    });
+      doc.text(`A. % of male classes receiving ESP = ${complianceResult.exceptionalServiceTest.malePercentage.toFixed(2)}%`, 30, yPosition + 38);
+      doc.text(`B. % of female classes receiving ESP = ${complianceResult.exceptionalServiceTest.femalePercentage.toFixed(2)}%`, 30, yPosition + 52);
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(8);
+      doc.text('*(If 20% or less, test result will be 0.00)', 30, yPosition + 65);
+    }
 
     addPageNumbers(doc);
 
