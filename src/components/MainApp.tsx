@@ -384,6 +384,14 @@ export function MainApp() {
   }
 
   function handleNavigateToReportView(reportType: 'jobDataEntry' | 'compliance' | 'predictedPay' | 'implementation') {
+    console.log('Navigating to report view:', reportType);
+    console.log('Current state:', {
+      currentJurisdiction: currentJurisdiction?.name,
+      selectedReport: selectedReport?.id,
+      jobsCount: jobs.length,
+      hasComplianceResult: !!complianceResult,
+      hasImplementationData: !!implementationData
+    });
     setReportViewType(reportType);
     setCurrentView('reportView');
   }
@@ -437,16 +445,15 @@ export function MainApp() {
             onNavigateToReportView={handleNavigateToReportView}
           />
         ) : currentView === 'reportView' && currentJurisdiction && selectedReport && reportViewType ? (
-          <>
-            {reportViewType === 'jobDataEntry' && jobs.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {reportViewType === 'jobDataEntry' && jobs.length > 0 ? (
               <JobDataEntryListPage
                 report={selectedReport}
                 jurisdiction={currentJurisdiction}
                 jobs={jobs}
                 onBack={handleBackFromReportView}
               />
-            )}
-            {reportViewType === 'compliance' && complianceResult && (
+            ) : reportViewType === 'compliance' && complianceResult ? (
               <ComplianceReportPage
                 report={selectedReport}
                 jurisdiction={currentJurisdiction}
@@ -454,8 +461,7 @@ export function MainApp() {
                 complianceResult={complianceResult}
                 onBack={handleBackFromReportView}
               />
-            )}
-            {reportViewType === 'predictedPay' && complianceResult && (
+            ) : reportViewType === 'predictedPay' && complianceResult ? (
               <PredictedPayReportPage
                 report={selectedReport}
                 jurisdiction={currentJurisdiction}
@@ -463,16 +469,31 @@ export function MainApp() {
                 complianceResult={complianceResult}
                 onBack={handleBackFromReportView}
               />
-            )}
-            {reportViewType === 'implementation' && implementationData && (
+            ) : reportViewType === 'implementation' && implementationData ? (
               <ImplementationReportPage
                 report={selectedReport}
                 jurisdiction={currentJurisdiction}
                 implementationData={implementationData}
                 onBack={handleBackFromReportView}
               />
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Report Not Available</h2>
+                <p className="text-gray-600 mb-4">
+                  {reportViewType === 'jobDataEntry' && jobs.length === 0 && 'No job data available. Please add jobs first.'}
+                  {reportViewType === 'compliance' && !complianceResult && 'No compliance analysis available. Please run compliance analysis first.'}
+                  {reportViewType === 'predictedPay' && !complianceResult && 'No compliance analysis available. Please run compliance analysis first.'}
+                  {reportViewType === 'implementation' && !implementationData && 'No implementation data available. Please complete the implementation form first.'}
+                </p>
+                <button
+                  onClick={handleBackFromReportView}
+                  className="px-4 py-2 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors"
+                >
+                  Back to Reports
+                </button>
+              </div>
             )}
-          </>
+          </div>
         ) : (
           <>
             <JurisdictionSearch
