@@ -27,7 +27,7 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       await new Promise<void>((resolve) => {
         reader.onloadend = () => {
           const base64data = reader.result as string;
-          doc.addImage(base64data, 'JPEG', 15, yPosition, 50, 12);
+          doc.addImage(base64data, 'JPEG', 15, yPosition, 70, 17);
           resolve();
         };
         reader.readAsDataURL(blob);
@@ -36,14 +36,14 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       console.error('Error loading logo:', error);
     }
 
-    yPosition = 42;
-    doc.setFontSize(20);
+    yPosition = 45;
+    doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
     doc.text('Pay Equity Compliance Report', 15, yPosition);
 
-    yPosition += 18;
-    doc.setFontSize(11);
+    yPosition += 16;
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
     doc.text(jurisdiction.name, 15, yPosition);
