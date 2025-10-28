@@ -36,18 +36,18 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       console.error('Error loading logo:', error);
     }
 
-    yPosition = 45;
+    yPosition = 55;
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
     doc.text('Pay Equity Compliance Report', 15, yPosition);
 
-    yPosition += 16;
+    yPosition += 22;
     doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(80, 80, 80);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
     doc.text(jurisdiction.name, 15, yPosition);
-    yPosition += 12;
+    yPosition += 15;
     doc.setFontSize(9);
     doc.text(`Report Year: ${report.report_year}`, 15, yPosition);
     yPosition += 10;
