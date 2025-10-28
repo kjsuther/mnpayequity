@@ -17,18 +17,33 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
   async function exportToPDF() {
     const doc = new jsPDF('portrait', 'pt', 'letter');
     const pageWidth = doc.internal.pageSize.width;
-    let yPosition = 30;
+    let yPosition = 15;
 
-    await addLogoToPDF(doc, '/MMB_logo copy copy copy.jpg');
+    try {
+      const response = await fetch('/MMB_logo copy copy copy.jpg');
+      const blob = await response.blob();
+      const reader = new FileReader();
 
-    yPosition = 35;
+      await new Promise<void>((resolve) => {
+        reader.onloadend = () => {
+          const base64data = reader.result as string;
+          doc.addImage(base64data, 'JPEG', 15, yPosition, 50, 12);
+          resolve();
+        };
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error loading logo:', error);
+    }
+
+    yPosition = 42;
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 0, 0);
     doc.text('Pay Equity Compliance Report', 15, yPosition);
 
-    yPosition += 20;
-    doc.setFontSize(12);
+    yPosition += 18;
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
     doc.text(jurisdiction.name, 15, yPosition);
