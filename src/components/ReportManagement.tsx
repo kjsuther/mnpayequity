@@ -10,6 +10,7 @@ import { ImportJobsModal } from './ImportJobsModal';
 import { ComplianceResults } from './ComplianceResults';
 import { ImplementationForm } from './ImplementationForm';
 import { ReportExportMenu } from './ReportExportMenu';
+import { SuccessModal } from './SuccessModal';
 import { analyzeCompliance, ComplianceResult } from '../lib/complianceAnalysis';
 
 type ReportManagementProps = {
@@ -33,6 +34,8 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
   const [showJobOptions, setShowJobOptions] = useState(false);
   const [entryMethod, setEntryMethod] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     loadReports();
@@ -286,12 +289,18 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
           title: job.title,
           males: job.males,
           females: job.females,
+          nonbinary: job.nonbinary || 0,
           points: job.points,
           min_salary: job.min_salary,
           max_salary: job.max_salary,
           years_to_max: job.years_to_max,
           years_service_pay: job.years_service_pay,
           exceptional_service_category: job.exceptional_service_category,
+          benefits_included_in_salary: job.benefits_included_in_salary || 0,
+          is_part_time: job.is_part_time || false,
+          hours_per_week: job.hours_per_week,
+          days_per_year: job.days_per_year,
+          additional_cash_compensation: job.additional_cash_compensation || 0,
         }));
 
         const { error: insertError } = await supabase
@@ -301,7 +310,11 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
         if (insertError) throw insertError;
 
         await loadJobs(currentReport.id);
-        alert(`Successfully copied ${sourceJobs.length} job classifications`);
+        setEntryMethod('manual');
+        setCurrentView('jobs');
+
+        setSuccessMessage(`Successfully copied ${sourceJobs.length} job classification${sourceJobs.length === 1 ? '' : 's'}`);
+        setShowSuccessModal(true);
       }
     } catch (error) {
       console.error('Error copying jobs:', error);
@@ -595,6 +608,12 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
           />
         </>
       )}
+
+      <SuccessModal
+        isOpen={showSuccessModal}
+        message={successMessage}
+        onClose={() => setShowSuccessModal(false)}
+      />
     </div>
   );
 }
