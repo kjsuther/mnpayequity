@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --mn-blue: #003865;
+  --mn-green: #78BE21;
+  --accent-teal: #008EAA;
+  --dark-gray: #53565A;
+  --medium-gray: #97999B;
+  --light-gray: #D9D9D6;
+  --bg-gray: #F5F5F5;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--dark-gray);
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  color: var(--mn-blue);
+}
+
+button {
+  cursor: pointer;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--mn-blue);
+  outline-offset: 2px;
+}
+
+a {
+  color: var(--mn-blue);
+  text-decoration: underline;
+}
+
+a:hover {
+  color: var(--accent-teal);
+}
+
+@media print {
+  @page {
+    margin: 0.75in;
+    size: letter;
+  }
+
+  body {
+    background: white !important;
+    color: black;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  * {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .bg-gray-50 {
+    background: white !important;
+  }
+
+  table {
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    color: black;
+  }
+
+  .bg-white {
+    background: white !important;
+  }
+
+  .border-gray-200 {
+    border-color: #d1d5db !important;
+  }
+
+  .text-gray-900,
+  .text-gray-800,
+  .text-gray-700,
+  .text-gray-600 {
+    color: black !important;
+  }
+
+  .bg-emerald-50,
+  .bg-amber-50,
+  .bg-rose-50 {
+    background: white !important;
+    border: 1px solid #d1d5db !important;
+  }
+
+  .text-emerald-600,
+  .text-amber-600,
+  .text-rose-600 {
+    color: black !important;
+  }
+}
