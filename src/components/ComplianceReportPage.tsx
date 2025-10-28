@@ -82,16 +82,22 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
     doc.text(lines, 20, yPosition + 8);
     yPosition += 35;
 
+    const section1Start = yPosition;
+    const tableHeight = (3 + 1) * (9 + 10) + 10;
+    const section1Height = 25 + tableHeight;
+
     doc.setFillColor(255, 255, 255);
     doc.setDrawColor(200, 200, 200);
-    doc.rect(20, yPosition, pageWidth - 40, 90, 'FD');
+    doc.setLineWidth(1);
+    doc.rect(20, section1Start, pageWidth - 40, section1Height, 'S');
+
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text('I. GENERAL JOB CLASS INFORMATION', 20, yPosition + 18);
+    doc.text('I. GENERAL JOB CLASS INFORMATION', 25, section1Start + 18);
 
     autoTable(doc, {
       startY: yPosition + 25,
-      margin: { left: 20, right: 20 },
+      margin: { left: 25, right: 25 },
       head: [['', 'Male Classes', 'Female Classes', 'Balanced Classes', 'All Job Classes']],
       body: [
         ['# Job Classes',
@@ -130,17 +136,20 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
         yPosition = 30;
       }
 
+      const section2Start = yPosition;
+      const section2Height = 175;
+
       doc.setFillColor(255, 255, 255);
       doc.setDrawColor(200, 200, 200);
-      const sectionHeight = 180;
-      doc.rect(20, yPosition, pageWidth - 40, sectionHeight, 'FD');
+      doc.setLineWidth(1);
+      doc.rect(20, section2Start, pageWidth - 40, section2Height, 'S');
 
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.text('II. STATISTICAL ANALYSIS TEST', 20, yPosition + 18);
+      doc.text('II. STATISTICAL ANALYSIS TEST', 25, yPosition + 18);
 
       doc.setFontSize(10);
-      doc.text(`A. UNDERPAYMENT RATIO = ${complianceResult.statisticalTest.underpaymentRatio.toFixed(2)}% *`, 25, yPosition + 38);
+      doc.text(`A. UNDERPAYMENT RATIO = ${complianceResult.statisticalTest.underpaymentRatio.toFixed(2)}% *`, 30, yPosition + 38);
 
       autoTable(doc, {
         startY: yPosition + 48,
@@ -194,7 +203,7 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       testYPos += 10;
       doc.text(`b. Avg.diff.in pay from predicted pay for female jobs = $${complianceResult.statisticalTest.avgDiffFemale.toFixed(2)}`, 50, testYPos);
 
-      yPosition += sectionHeight + 20;
+      yPosition = section2Start + section2Height + 10;
     }
 
     if (!complianceResult.requiresManualReview && complianceResult.salaryRangeTest) {
@@ -203,14 +212,18 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
         yPosition = 30;
       }
 
+      const section3Start = yPosition;
+      const section3Height = 62;
+
       doc.setFillColor(255, 255, 255);
       doc.setDrawColor(200, 200, 200);
-      doc.rect(20, yPosition, pageWidth - 40, 70, 'FD');
+      doc.setLineWidth(1);
+      doc.rect(20, section3Start, pageWidth - 40, section3Height, 'S');
 
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
-      doc.text(`III. SALARY RANGE TEST = ${(complianceResult.salaryRangeTest.ratio * 100).toFixed(2)}% (Result is A divided by B)`, 20, yPosition + 18);
+      doc.text(`III. SALARY RANGE TEST = ${(complianceResult.salaryRangeTest.ratio * 100).toFixed(2)}% (Result is A divided by B)`, 25, yPosition + 18);
 
       if (complianceResult.salaryRangeTest.passed) {
         doc.setTextColor(16, 185, 129);
@@ -226,7 +239,7 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       doc.text(`A. Avg.# of years to max salary for male jobs = ${complianceResult.salaryRangeTest.maleAverage.toFixed(2)}`, 30, yPosition + 38);
       doc.text(`B. Avg.# of years to max salary for female jobs = ${complianceResult.salaryRangeTest.femaleAverage.toFixed(2)}`, 30, yPosition + 52);
 
-      yPosition += 90;
+      yPosition = section3Start + section3Height + 10;
     }
 
     if (!complianceResult.requiresManualReview && complianceResult.exceptionalServiceTest) {
@@ -235,14 +248,18 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
         yPosition = 30;
       }
 
+      const section4Start = yPosition;
+      const section4Height = 75;
+
       doc.setFillColor(255, 255, 255);
       doc.setDrawColor(200, 200, 200);
-      doc.rect(20, yPosition, pageWidth - 40, 75, 'FD');
+      doc.setLineWidth(1);
+      doc.rect(20, section4Start, pageWidth - 40, section4Height, 'S');
 
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
-      doc.text(`IV. EXCEPTIONAL SERVICE PAY TEST = ${(complianceResult.exceptionalServiceTest.ratio * 100).toFixed(2)}% (Result is B divided by A)`, 20, yPosition + 18);
+      doc.text(`IV. EXCEPTIONAL SERVICE PAY TEST = ${(complianceResult.exceptionalServiceTest.ratio * 100).toFixed(2)}% (Result is B divided by A)`, 25, yPosition + 18);
 
       if (complianceResult.exceptionalServiceTest.passed) {
         doc.setTextColor(16, 185, 129);
@@ -260,6 +277,8 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
       doc.setFont('helvetica', 'italic');
       doc.setFontSize(8);
       doc.text('*(If 20% or less, test result will be 0.00)', 30, yPosition + 65);
+
+      yPosition = section4Start + section4Height + 10;
     }
 
     addPageNumbers(doc);
