@@ -509,6 +509,9 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
                     onAddJob={handleAddJob}
                     onUpdateJob={handleUpdateJob}
                     onDeleteJob={handleDeleteJob}
+                    onCopyJobs={() => setIsCopyJobsModalOpen(true)}
+                    onImportJobs={() => setIsImportJobsModalOpen(true)}
+                    onNoJobsToReport={() => handleEntryMethod('none')}
                   />
                   {jobs.length > 0 && currentReport.case_status !== 'Submitted' && (
                     <div className="flex justify-end">

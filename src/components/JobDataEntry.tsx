@@ -1,17 +1,22 @@
 import { useState } from 'react';
 import { Edit2, Trash2, Plus, Save, X, AlertCircle, Calculator } from 'lucide-react';
 import { JobClassification } from '../lib/supabase';
+import { JobEntryMethodModal } from './JobEntryMethodModal';
 
 type JobDataEntryProps = {
   jobs: JobClassification[];
   onAddJob: (jobData: Partial<JobClassification>) => Promise<void>;
   onUpdateJob: (jobId: string, jobData: Partial<JobClassification>) => Promise<void>;
   onDeleteJob: (jobId: string) => Promise<void>;
+  onCopyJobs?: () => void;
+  onImportJobs?: () => void;
+  onNoJobsToReport?: () => void;
 };
 
-export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob }: JobDataEntryProps) {
+export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob, onCopyJobs, onImportJobs, onNoJobsToReport }: JobDataEntryProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isJobEntryMethodModalOpen, setIsJobEntryMethodModalOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<JobClassification>>({
     title: '',
     males: 0,
@@ -29,6 +34,28 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob }: JobDa
     days_per_year: null,
     additional_cash_compensation: 0,
   });
+
+  const handleShowEntryOptions = () => {
+    if (onCopyJobs || onImportJobs || onNoJobsToReport) {
+      setIsJobEntryMethodModalOpen(true);
+    } else {
+      handleStartAdd();
+    }
+  };
+
+  const handleJobEntryMethodSelect = (method: 'manual' | 'copy' | 'import' | 'none') => {
+    setIsJobEntryMethodModalOpen(false);
+
+    if (method === 'manual') {
+      handleStartAdd();
+    } else if (method === 'copy' && onCopyJobs) {
+      onCopyJobs();
+    } else if (method === 'import' && onImportJobs) {
+      onImportJobs();
+    } else if (method === 'none' && onNoJobsToReport) {
+      onNoJobsToReport();
+    }
+  };
 
   const handleStartAdd = () => {
     setIsAdding(true);
@@ -114,7 +141,7 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob }: JobDa
           <h3 className="text-lg font-semibold text-gray-900">Job Classifications</h3>
           {!isAdding && !editingId && (
             <button
-              onClick={handleStartAdd}
+              onClick={handleShowEntryOptions}
               className="flex items-center gap-2 px-4 py-2 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -445,6 +472,12 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob }: JobDa
           </div>
         </div>
       </div>
+
+      <JobEntryMethodModal
+        isOpen={isJobEntryMethodModalOpen}
+        onClose={() => setIsJobEntryMethodModalOpen(false)}
+        onSelectMethod={handleJobEntryMethodSelect}
+      />
     </div>
   );
 }
