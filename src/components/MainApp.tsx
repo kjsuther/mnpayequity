@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { JurisdictionSearch } from './JurisdictionSearch';
@@ -22,16 +23,18 @@ import { ImplementationReportPage } from './ImplementationReportPage';
 import { WelcomeTutorial } from './WelcomeTutorial';
 import { HelpCenter } from './HelpCenter';
 import { DataGatheringGuide } from './DataGatheringGuide';
+import { UserAccountManagement } from './UserAccountManagement';
 import { supabase, type Jurisdiction, type Contact, type Report, type JobClassification, type ImplementationReport } from '../lib/supabase';
 import { analyzeCompliance, type ComplianceResult } from '../lib/complianceAnalysis';
 
 export function MainApp() {
+  const { userProfile, isAdmin } = useAuth();
   const [jurisdictions, setJurisdictions] = useState<Jurisdiction[]>([]);
   const [currentJurisdiction, setCurrentJurisdiction] = useState<Jurisdiction | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide'>('dashboard');
+  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement'>('dashboard');
   const [reportViewType, setReportViewType] = useState<'jobDataEntry' | 'compliance' | 'predictedPay' | 'implementation' | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
@@ -139,7 +142,16 @@ export function MainApp() {
       setJurisdictions(data || []);
 
       if (data && data.length > 0) {
-        setCurrentJurisdiction(data[0]);
+        if (userProfile?.jurisdiction_id) {
+          const userJurisdiction = data.find(j => j.jurisdiction_id === userProfile.jurisdiction_id);
+          if (userJurisdiction) {
+            setCurrentJurisdiction(userJurisdiction);
+          } else {
+            setCurrentJurisdiction(data[0]);
+          }
+        } else {
+          setCurrentJurisdiction(data[0]);
+        }
       }
     } catch (error) {
       console.error('Error loading jurisdictions:', error);
@@ -369,7 +381,7 @@ export function MainApp() {
     );
   }
 
-  function handleNavigate(view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide') {
+  function handleNavigate(view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement') {
     if (view === 'jobs') {
       if (!currentJurisdiction) {
         alert('Please select a jurisdiction first.');
@@ -421,6 +433,7 @@ export function MainApp() {
         hasActiveReport={!!selectedReport}
         hasActiveJurisdiction={!!currentJurisdiction}
         onShowHelp={() => setShowHelpCenter(true)}
+        isAdmin={isAdmin}
       />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
@@ -439,6 +452,8 @@ export function MainApp() {
           />
         ) : currentView === 'dataGuide' ? (
           <DataGatheringGuide onBack={() => setCurrentView('dashboard')} />
+        ) : currentView === 'userManagement' ? (
+          <UserAccountManagement onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'dashboard' ? (
           currentJurisdiction ? (
             <Dashboard

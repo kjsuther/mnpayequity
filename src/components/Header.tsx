@@ -4,14 +4,15 @@ import { useState, useRef, useEffect } from 'react';
 import { ComprehensiveHelpGuide } from './ComprehensiveHelpGuide';
 
 type HeaderProps = {
-  currentView?: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes';
-  onNavigate?: (view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes') => void;
+  currentView?: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'userManagement';
+  onNavigate?: (view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'userManagement') => void;
   hasActiveReport?: boolean;
   hasActiveJurisdiction?: boolean;
   onShowHelp?: () => void;
+  isAdmin?: boolean;
 };
 
-export function Header({ currentView = 'home', onNavigate, hasActiveReport = false, hasActiveJurisdiction = false, onShowHelp }: HeaderProps = {}) {
+export function Header({ currentView = 'home', onNavigate, hasActiveReport = false, hasActiveJurisdiction = false, onShowHelp, isAdmin = false }: HeaderProps = {}) {
   const { signOut } = useAuth();
   const [isUtilitiesOpen, setIsUtilitiesOpen] = useState(false);
   const [isGoToOpen, setIsGoToOpen] = useState(false);
@@ -64,7 +65,7 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
     onNavigate?.(view);
   };
 
-  const handleAdminNavigation = (view: 'jurisdictionLookup') => {
+  const handleAdminNavigation = (view: 'jurisdictionLookup' | 'userManagement') => {
     setIsAdminOpen(false);
     onNavigate?.(view);
   };
@@ -241,35 +242,43 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
                 </div>
               )}
             </li>
-            <li
-              ref={adminRef}
-              className="relative"
-              onMouseEnter={() => setIsAdminOpen(true)}
-              onMouseLeave={() => setIsAdminOpen(false)}
-            >
-              <button
-                className="flex items-center gap-1 py-3 px-2 text-white hover:bg-[#005a9f] transition-colors"
+            {isAdmin && (
+              <li
+                ref={adminRef}
+                className="relative"
+                onMouseEnter={() => setIsAdminOpen(true)}
+                onMouseLeave={() => setIsAdminOpen(false)}
               >
-                Admin
-                <ChevronDown size={16} className={`transition-transform ${isAdminOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {isAdminOpen && (
-                <div className="absolute left-0 top-full mt-0 bg-white shadow-lg rounded-b border border-gray-200 min-w-[200px] z-50">
-                  <button
-                    onClick={handleSendEmail}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    Send Email
-                  </button>
-                  <button
-                    onClick={() => handleAdminNavigation('jurisdictionLookup')}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    Jurisdiction Lookup
-                  </button>
-                </div>
-              )}
-            </li>
+                <button
+                  className="flex items-center gap-1 py-3 px-2 text-white hover:bg-[#005a9f] transition-colors"
+                >
+                  Admin
+                  <ChevronDown size={16} className={`transition-transform ${isAdminOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isAdminOpen && (
+                  <div className="absolute left-0 top-full mt-0 bg-white shadow-lg rounded-b border border-gray-200 min-w-[200px] z-50">
+                    <button
+                      onClick={handleSendEmail}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Send Email
+                    </button>
+                    <button
+                      onClick={() => handleAdminNavigation('jurisdictionLookup')}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Jurisdiction Lookup
+                    </button>
+                    <button
+                      onClick={() => handleAdminNavigation('userManagement')}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors border-t border-gray-100"
+                    >
+                      User Account Management
+                    </button>
+                  </div>
+                )}
+              </li>
+            )}
           </ul>
         </div>
       </nav>

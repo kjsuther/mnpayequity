@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { AlertCircle, Lock, Mail, Building2, ArrowLeft } from 'lucide-react';
+import type { Jurisdiction } from '../lib/supabase';
 
 export function LoginPage() {
   const { signIn, signUp, resetPassword } = useAuth();
@@ -9,9 +11,44 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [jurisdictionId, setJurisdictionId] = useState('');
+  const [jurisdictions, setJurisdictions] = useState<Jurisdiction[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingJurisdictions, setLoadingJurisdictions] = useState(true);
   const [showInstructions, setShowInstructions] = useState(false);
+
+  useEffect(() => {
+    loadJurisdictions();
+  }, []);
+
+  const loadJurisdictions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('jurisdictions')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      setJurisdictions(data || []);
+    } catch (error) {
+      console.error('Error loading jurisdictions:', error);
+    } finally {
+      setLoadingJurisdictions(false);
+    }
+  };
+
+  const filteredJurisdictions = jurisdictions.filter(j =>
+    j.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    j.jurisdiction_id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleJurisdictionSelect = (jurisdiction: Jurisdiction) => {
+    setJurisdictionId(jurisdiction.jurisdiction_id);
+    setSearchTerm(`${jurisdiction.name} (${jurisdiction.jurisdiction_id})`);
+    setShowDropdown(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +75,7 @@ export function LoginPage() {
         }
       } else if (isSignUp) {
         if (!jurisdictionId.trim()) {
-          setError('Jurisdiction ID is required for registration');
+          setError('Jurisdiction selection is required for registration');
           setLoading(false);
           return;
         }
@@ -46,10 +83,15 @@ export function LoginPage() {
         if (error) {
           setError(error.message);
         } else {
-          setError('Account created! Please check your email to verify your account.');
+          setError('Account created successfully! You can now sign in.');
         }
       } else {
-        const { error } = await signIn(email, password);
+        if (!jurisdictionId.trim()) {
+          setError('Please select your jurisdiction');
+          setLoading(false);
+          return;
+        }
+        const { error } = await signIn(email, password, jurisdictionId);
         if (error) {
           setError(error.message);
         }
@@ -66,6 +108,7 @@ export function LoginPage() {
     setIsSignUp(false);
     setError(null);
     setJurisdictionId('');
+    setSearchTerm('');
   };
 
   return (
@@ -202,31 +245,50 @@ export function LoginPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  {isSignUp && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Jurisdiction ID
-                      </label>
-                      <div className="relative">
-                        <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                        <input
-                          type="text"
-                          value={jurisdictionId}
-                          onChange={(e) => setJurisdictionId(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#003865] focus:border-transparent"
-                          placeholder="Enter your jurisdiction ID"
-                          required={isSignUp}
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setShowInstructions(!showInstructions)}
-                        className="mt-1 text-xs text-[#003865] hover:text-[#78BE21] font-medium"
-                      >
-                        Don't know your jurisdiction ID?
-                      </button>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Jurisdiction *
+                    </label>
+                    <div className="relative">
+                      <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" size={20} />
+                      <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => {
+                          setSearchTerm(e.target.value);
+                          setShowDropdown(true);
+                        }}
+                        onFocus={() => setShowDropdown(true)}
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                        placeholder="Search by name or ID..."
+                        required
+                      />
+                      {showDropdown && searchTerm && (
+                        <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                          {loadingJurisdictions ? (
+                            <div className="p-3 text-sm text-gray-500">Loading jurisdictions...</div>
+                          ) : filteredJurisdictions.length > 0 ? (
+                            filteredJurisdictions.map((jurisdiction) => (
+                              <button
+                                key={jurisdiction.id}
+                                type="button"
+                                onClick={() => handleJurisdictionSelect(jurisdiction)}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors border-b border-gray-100 last:border-b-0"
+                              >
+                                <div className="font-medium text-gray-900">{jurisdiction.name}</div>
+                                <div className="text-sm text-gray-500">ID: {jurisdiction.jurisdiction_id}</div>
+                              </button>
+                            ))
+                          ) : (
+                            <div className="p-3 text-sm text-gray-500">No jurisdictions found</div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      Start typing to search for your jurisdiction
+                    </p>
+                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
