@@ -55,7 +55,7 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
   };
 
   const handleSendEmail = () => {
-    setIsUtilitiesOpen(false);
+    setIsAdminOpen(false);
     onNavigate?.('sendEmail');
   };
 
@@ -238,12 +238,6 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
                   >
                     Change Password
                   </button>
-                  <button
-                    onClick={handleSendEmail}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    Send Email
-                  </button>
                 </div>
               )}
             </li>
@@ -261,6 +255,12 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
               </button>
               {isAdminOpen && (
                 <div className="absolute left-0 top-full mt-0 bg-white shadow-lg rounded-b border border-gray-200 min-w-[200px] z-50">
+                  <button
+                    onClick={handleSendEmail}
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Send Email
+                  </button>
                   <button
                     onClick={() => handleAdminNavigation('jurisdictionLookup')}
                     className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
