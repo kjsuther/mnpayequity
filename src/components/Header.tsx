@@ -1,6 +1,7 @@
-import { LogOut, ChevronDown, HelpCircle } from 'lucide-react';
+import { LogOut, ChevronDown, HelpCircle, Book } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useRef, useEffect } from 'react';
+import { ComprehensiveHelpGuide } from './ComprehensiveHelpGuide';
 
 type HeaderProps = {
   currentView?: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes';
@@ -15,9 +16,12 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
   const [isUtilitiesOpen, setIsUtilitiesOpen] = useState(false);
   const [isGoToOpen, setIsGoToOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [showComprehensiveGuide, setShowComprehensiveGuide] = useState(false);
   const utilitiesRef = useRef<HTMLLIElement>(null);
   const goToRef = useRef<HTMLLIElement>(null);
   const adminRef = useRef<HTMLLIElement>(null);
+  const helpRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -29,6 +33,9 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
       }
       if (adminRef.current && !adminRef.current.contains(event.target as Node)) {
         setIsAdminOpen(false);
+      }
+      if (helpRef.current && !helpRef.current.contains(event.target as Node)) {
+        setIsHelpOpen(false);
       }
     }
 
@@ -83,16 +90,49 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
           </div>
 
           <div className="flex items-center gap-4">
-            {onShowHelp && (
+            <div ref={helpRef} className="relative">
               <button
-                onClick={onShowHelp}
+                onClick={() => setIsHelpOpen(!isHelpOpen)}
                 className="flex items-center gap-2 px-4 py-2 text-white hover:bg-white/10 rounded transition-colors"
-                title="Help Center"
+                title="Help & Resources"
               >
                 <HelpCircle size={20} />
                 <span className="text-sm">Help</span>
+                <ChevronDown size={16} className={`transition-transform ${isHelpOpen ? 'rotate-180' : ''}`} />
               </button>
-            )}
+              {isHelpOpen && (
+                <div className="absolute right-0 top-full mt-2 bg-white shadow-lg rounded border border-gray-200 min-w-[240px] z-50">
+                  <button
+                    onClick={() => {
+                      setIsHelpOpen(false);
+                      setShowComprehensiveGuide(true);
+                    }}
+                    className="flex items-center gap-3 w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors border-b border-gray-100"
+                  >
+                    <Book className="w-5 h-5 text-[#003865]" />
+                    <div>
+                      <div className="font-medium">Complete Help Guide</div>
+                      <div className="text-xs text-gray-500">Step-by-step instructions</div>
+                    </div>
+                  </button>
+                  {onShowHelp && (
+                    <button
+                      onClick={() => {
+                        setIsHelpOpen(false);
+                        onShowHelp();
+                      }}
+                      className="flex items-center gap-3 w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      <HelpCircle className="w-5 h-5 text-[#003865]" />
+                      <div>
+                        <div className="font-medium">Help Center</div>
+                        <div className="text-xs text-gray-500">Search articles & FAQs</div>
+                      </div>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
             <button
               onClick={() => onNavigate?.('reports')}
               className="px-4 py-2 border border-white text-white text-sm font-normal rounded hover:bg-white/10 transition-colors"
@@ -233,6 +273,10 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
           </ul>
         </div>
       </nav>
+
+      {showComprehensiveGuide && (
+        <ComprehensiveHelpGuide onClose={() => setShowComprehensiveGuide(false)} />
+      )}
     </header>
   );
 }
