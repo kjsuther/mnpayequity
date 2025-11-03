@@ -105,22 +105,22 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
           <ul className="flex gap-6 text-sm">
             <li>
               <button
-                onClick={() => onNavigate?.('home')}
-                className={`block py-3 px-2 text-white hover:bg-[#005a9f] transition-colors ${
-                  currentView === 'home' ? 'border-b-2 border-[#78BE21]' : ''
-                }`}
-              >
-                Home
-              </button>
-            </li>
-            <li>
-              <button
                 onClick={() => onNavigate?.('dashboard')}
                 className={`block py-3 px-2 text-white hover:bg-[#005a9f] transition-colors ${
                   currentView === 'dashboard' ? 'border-b-2 border-[#78BE21]' : ''
                 }`}
               >
                 Dashboard
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => onNavigate?.('home')}
+                className={`block py-3 px-2 text-white hover:bg-[#005a9f] transition-colors ${
+                  currentView === 'home' ? 'border-b-2 border-[#78BE21]' : ''
+                }`}
+              >
+                Jurisdiction Info
               </button>
             </li>
             <li

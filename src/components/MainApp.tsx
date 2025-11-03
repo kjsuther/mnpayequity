@@ -31,7 +31,7 @@ export function MainApp() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide'>('dashboard');
   const [reportViewType, setReportViewType] = useState<'jobDataEntry' | 'compliance' | 'predictedPay' | 'implementation' | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
@@ -425,31 +425,46 @@ export function MainApp() {
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
         {currentView === 'changePassword' ? (
-          <ChangePassword onBack={() => setCurrentView('home')} />
+          <ChangePassword onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'sendEmail' ? (
-          <SendEmail onBack={() => setCurrentView('home')} />
+          <SendEmail onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'notes' && currentJurisdiction ? (
-          <Notes jurisdiction={currentJurisdiction} onBack={() => setCurrentView('home')} />
+          <Notes jurisdiction={currentJurisdiction} onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'jobs' && currentJurisdiction ? (
-          <JobsPage jurisdiction={currentJurisdiction} onBack={() => setCurrentView('home')} />
+          <JobsPage jurisdiction={currentJurisdiction} onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'testResults' && currentJurisdiction ? (
           <TestResultsPage
             jurisdiction={currentJurisdiction}
-            onBack={() => setCurrentView('home')}
+            onBack={() => setCurrentView('dashboard')}
           />
         ) : currentView === 'dataGuide' ? (
-          <DataGatheringGuide onBack={() => setCurrentView('home')} />
-        ) : currentView === 'dashboard' && currentJurisdiction ? (
-          <Dashboard
-            jurisdiction={currentJurisdiction}
-            reports={reports}
-            onManageReports={() => setCurrentView('reports')}
-            onViewReport={(report) => {
-              setSelectedReport(report);
-              setCurrentView('reports');
-            }}
-            onShowDataGuide={() => setCurrentView('dataGuide')}
-          />
+          <DataGatheringGuide onBack={() => setCurrentView('dashboard')} />
+        ) : currentView === 'dashboard' ? (
+          currentJurisdiction ? (
+            <Dashboard
+              jurisdiction={currentJurisdiction}
+              reports={reports}
+              onManageReports={() => setCurrentView('reports')}
+              onViewReport={(report) => {
+                setSelectedReport(report);
+                setCurrentView('reports');
+              }}
+              onShowDataGuide={() => setCurrentView('dataGuide')}
+            />
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to Pay Equity Reporting</h2>
+              <p className="text-gray-600 mb-6">
+                To get started, please select or add a jurisdiction from the Jurisdiction Info page.
+              </p>
+              <button
+                onClick={() => setCurrentView('home')}
+                className="px-6 py-3 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors font-medium"
+              >
+                Go to Jurisdiction Info
+              </button>
+            </div>
+          )
         ) : currentView === 'reports' && currentJurisdiction ? (
           <ReportManagement
             jurisdiction={currentJurisdiction}
