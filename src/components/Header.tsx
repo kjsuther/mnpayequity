@@ -14,8 +14,10 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
   const { signOut } = useAuth();
   const [isUtilitiesOpen, setIsUtilitiesOpen] = useState(false);
   const [isGoToOpen, setIsGoToOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const utilitiesRef = useRef<HTMLLIElement>(null);
   const goToRef = useRef<HTMLLIElement>(null);
+  const adminRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -24,6 +26,9 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
       }
       if (goToRef.current && !goToRef.current.contains(event.target as Node)) {
         setIsGoToOpen(false);
+      }
+      if (adminRef.current && !adminRef.current.contains(event.target as Node)) {
+        setIsAdminOpen(false);
       }
     }
 
@@ -47,8 +52,13 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
     onNavigate?.('sendEmail');
   };
 
-  const handleGoToNavigation = (view: 'jobs' | 'testResults' | 'reports' | 'jurisdictionLookup' | 'notes') => {
+  const handleGoToNavigation = (view: 'jobs' | 'testResults' | 'reports') => {
     setIsGoToOpen(false);
+    onNavigate?.(view);
+  };
+
+  const handleAdminNavigation = (view: 'jurisdictionLookup') => {
+    setIsAdminOpen(false);
     onNavigate?.(view);
   };
 
@@ -165,18 +175,6 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
                   >
                     Reports
                   </button>
-                  <button
-                    onClick={() => handleGoToNavigation('jurisdictionLookup')}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    Jurisdiction LookUp
-                  </button>
-                  <button
-                    onClick={() => handleGoToNavigation('notes')}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    Notes
-                  </button>
                 </div>
               )}
             </li>
@@ -205,6 +203,29 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
                     className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                   >
                     Send Email
+                  </button>
+                </div>
+              )}
+            </li>
+            <li
+              ref={adminRef}
+              className="relative"
+              onMouseEnter={() => setIsAdminOpen(true)}
+              onMouseLeave={() => setIsAdminOpen(false)}
+            >
+              <button
+                className="flex items-center gap-1 py-3 px-2 text-white hover:bg-[#005a9f] transition-colors"
+              >
+                Admin
+                <ChevronDown size={16} className={`transition-transform ${isAdminOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isAdminOpen && (
+                <div className="absolute left-0 top-full mt-0 bg-white shadow-lg rounded-b border border-gray-200 min-w-[200px] z-50">
+                  <button
+                    onClick={() => handleAdminNavigation('jurisdictionLookup')}
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Jurisdiction Lookup
                   </button>
                 </div>
               )}
