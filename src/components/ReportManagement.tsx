@@ -512,7 +512,7 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                Notes
+                Case Notes
               </button>
             </div>
           </div>
