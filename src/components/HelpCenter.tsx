@@ -20,8 +20,22 @@ const helpArticles: HelpArticle[] = [
     id: '1',
     title: 'What is the Minnesota Local Government Pay Equity Act?',
     category: 'Getting Started',
-    content: 'The Minnesota Local Government Pay Equity Act (Minnesota Statutes 471.991-471.999) requires local governments to ensure equitable compensation between female-dominated and male-dominated job classes of comparable work value. All political subdivisions with more than one female job class must submit annual pay equity reports.',
+    content: 'The Minnesota Local Government Pay Equity Act (Minnesota Statutes 471.991-471.999) requires local governments to ensure equitable compensation between female-dominated and male-dominated job classes of comparable work value. All political subdivisions with more than one female job class must submit annual pay equity reports. For complete details, visit: https://mn.gov/mmb/employee-relations/labor-relations/pay-equity/local-government/',
     keywords: ['law', 'act', 'requirements', 'basics', 'overview'],
+  },
+  {
+    id: '1b',
+    title: 'Official Submission Instructions PDF',
+    category: 'Getting Started',
+    content: 'Download the complete instructions for submitting your local government pay equity report. This comprehensive PDF from Minnesota Management & Budget covers all requirements, deadlines, and submission procedures. Access it at: https://mn.gov/mmb-stat/pay-equity/Instructions%20for%20submitting%20a%20local%20government%20pay%20equity%20report.pdf',
+    keywords: ['instructions', 'submit', 'submission', 'requirements', 'how to', 'guide', 'pdf'],
+  },
+  {
+    id: '1c',
+    title: 'State Job Match Evaluation System Guide',
+    category: 'Job Evaluation',
+    content: 'The State Job Match system helps you evaluate job classifications and assign points based on skill, effort, responsibility, and working conditions. Download the detailed 2023 guide at: https://mn.gov/mmb-stat/pay-equity/State%20Job%20Match%20Evaluation%20System-%202023.pdf',
+    keywords: ['points', 'evaluation', 'job match', 'state system', 'classification', '2023'],
   },
   {
     id: '2',
@@ -99,6 +113,20 @@ const helpArticles: HelpArticle[] = [
     category: 'Data Entry',
     content: 'Yes! The system allows you to copy job classifications from a previous year\'s report. This is helpful if your job structure hasn\'t changed significantly. After copying, you must review and update: employee counts (males, females, non-binary), salary amounts (if there were raises), and any other changed information. Always verify that copied data is current and accurate.',
     keywords: ['copy', 'previous year', 'import', 'reuse', 'duplicate'],
+  },
+  {
+    id: '13',
+    title: 'Understanding Pay Equity Compliance',
+    category: 'Compliance',
+    content: 'This comprehensive guide explains what pay equity compliance means, how the tests work, and what actions to take if you\'re not in compliance. Essential reading for understanding your results. Download at: https://mn.gov/mmb-stat/pay-equity/guide-understand-compl.pdf',
+    keywords: ['compliance', 'understanding', 'guide', 'requirements', 'tests'],
+  },
+  {
+    id: '14',
+    title: 'How to Interpret Your Test Results',
+    category: 'Compliance',
+    content: 'Detailed guide on interpreting the statistical analysis, salary range test, and exceptional service pay test results. Learn what each number means and how to address failures. Download at: https://mn.gov/mmb-stat/pay-equity/interpret-results-pay%20equity.pdf',
+    keywords: ['results', 'interpret', 'tests', 'analysis', 'understand', 'statistical'],
   },
 ];
 

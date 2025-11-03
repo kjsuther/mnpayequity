@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Edit2, Trash2, Plus, Save, X, AlertCircle, Calculator } from 'lucide-react';
+import { Edit2, Trash2, Plus, Save, X, AlertCircle, Calculator, BookOpen } from 'lucide-react';
 import { JobClassification } from '../lib/supabase';
 import { JobEntryMethodModal } from './JobEntryMethodModal';
+import { ContextualHelp } from './ContextualHelp';
+import { JobDataEntryHelp } from './JobDataEntryHelp';
 
 type JobDataEntryProps = {
   jobs: JobClassification[];
@@ -17,6 +19,7 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob, onCopyJ
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isJobEntryMethodModalOpen, setIsJobEntryMethodModalOpen] = useState(false);
+  const [showFieldGuide, setShowFieldGuide] = useState(false);
   const [formData, setFormData] = useState<Partial<JobClassification>>({
     title: '',
     males: 0,
@@ -121,33 +124,29 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob, onCopyJ
 
   return (
     <div className="space-y-4">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-blue-900">
-            <p className="font-semibold mb-2">Employee Eligibility & Salary Reporting Requirements:</p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Include only employees who work at least 14 hours per week AND 67 days per year (100 days for students)</li>
-              <li>Report all salaries as monthly full-time equivalents</li>
-              <li>For part-time employees: Hourly rate × 173.3 = Monthly FTE salary</li>
-              <li>Include additional cash compensation (bonuses, lump sums) that exceed the salary range maximum</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <ContextualHelp context="job-data-entry" />
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Job Classifications</h3>
-          {!isAdding && !editingId && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={handleShowEntryOptions}
-              className="flex items-center gap-2 px-4 py-2 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors"
+              onClick={() => setShowFieldGuide(true)}
+              className="flex items-center gap-2 px-4 py-2 border border-[#003865] text-[#003865] rounded-lg hover:bg-blue-50 transition-colors"
             >
-              <Plus className="w-4 h-4" />
-              Add Job
+              <BookOpen className="w-4 h-4" />
+              Field Guide
             </button>
-          )}
+            {!isAdding && !editingId && (
+              <button
+                onClick={handleShowEntryOptions}
+                className="flex items-center gap-2 px-4 py-2 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Add Job
+              </button>
+            )}
+          </div>
         </div>
 
       <div className="overflow-x-auto">
@@ -477,6 +476,11 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob, onCopyJ
         isOpen={isJobEntryMethodModalOpen}
         onClose={() => setIsJobEntryMethodModalOpen(false)}
         onSelectMethod={handleJobEntryMethodSelect}
+      />
+
+      <JobDataEntryHelp
+        isOpen={showFieldGuide}
+        onClose={() => setShowFieldGuide(false)}
       />
     </div>
   );

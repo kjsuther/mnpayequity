@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Save, Send } from 'lucide-react';
 import { ImplementationReport, Report, Jurisdiction, JobClassification } from '../lib/supabase';
 import { SubmissionChecklist } from './SubmissionChecklist';
+import { ContextualHelp } from './ContextualHelp';
 
 type ImplementationFormProps = {
   report: Report;
@@ -86,13 +87,16 @@ export function ImplementationForm({
   const isSubmitted = report.case_status === 'Submitted';
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-8">
-      <div className="border-b border-gray-200 pb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Pay Equity Implementation Form</h2>
-        <p className="text-sm text-gray-600 mt-1">
-          Information entered on this page is not submitted until you click "Sign and Submit"
-        </p>
-      </div>
+    <div className="space-y-6">
+      <ContextualHelp context="implementation-form" />
+
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-8">
+        <div className="border-b border-gray-200 pb-4">
+          <h2 className="text-2xl font-bold text-gray-900">Pay Equity Implementation Form</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Information entered on this page is not submitted until you click "Sign and Submit"
+          </p>
+        </div>
 
       {/* Part A: Jurisdiction Identification */}
       <div className="space-y-4">
@@ -351,14 +355,15 @@ export function ImplementationForm({
         </div>
       )}
 
-      {showChecklist && (
-        <SubmissionChecklist
-          jobs={jobs}
-          implementationData={formData}
-          onClose={() => setShowChecklist(false)}
-          onProceedToSubmit={handleProceedToSubmit}
-        />
-      )}
+        {showChecklist && (
+          <SubmissionChecklist
+            jobs={jobs}
+            implementationData={formData}
+            onClose={() => setShowChecklist(false)}
+            onProceedToSubmit={handleProceedToSubmit}
+          />
+        )}
+      </div>
     </div>
   );
 }
