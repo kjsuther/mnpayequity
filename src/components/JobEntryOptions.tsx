@@ -1,4 +1,4 @@
-import { FileEdit, Copy, Upload, FileX } from 'lucide-react';
+import { FileEdit, Copy, Upload, FileX, Info } from 'lucide-react';
 
 type JobEntryOptionsProps = {
   onEnterOnline: () => void;
@@ -16,6 +16,21 @@ export function JobEntryOptions({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">How would you like to enter job data?</h3>
+
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex items-start gap-3">
+          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-blue-800">
+            <p className="font-medium mb-1">Choose the method that works best for you:</p>
+            <ul className="space-y-1 text-blue-700">
+              <li>• <strong>Enter Online:</strong> Best for new jurisdictions or those with few job classes</li>
+              <li>• <strong>Copy from Previous:</strong> Fastest if job structure hasn't changed much</li>
+              <li>• <strong>Import Excel:</strong> Efficient for large numbers of jobs with existing data</li>
+              <li>• <strong>No Jobs:</strong> Select if no employees meet reporting requirements</li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <button

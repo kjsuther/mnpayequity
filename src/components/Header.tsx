@@ -1,4 +1,4 @@
-import { LogOut, ChevronDown } from 'lucide-react';
+import { LogOut, ChevronDown, HelpCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 
@@ -7,9 +7,10 @@ type HeaderProps = {
   onNavigate?: (view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes') => void;
   hasActiveReport?: boolean;
   hasActiveJurisdiction?: boolean;
+  onShowHelp?: () => void;
 };
 
-export function Header({ currentView = 'home', onNavigate, hasActiveReport = false, hasActiveJurisdiction = false }: HeaderProps = {}) {
+export function Header({ currentView = 'home', onNavigate, hasActiveReport = false, hasActiveJurisdiction = false, onShowHelp }: HeaderProps = {}) {
   const { signOut } = useAuth();
   const [isUtilitiesOpen, setIsUtilitiesOpen] = useState(false);
   const [isGoToOpen, setIsGoToOpen] = useState(false);
@@ -72,6 +73,16 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
           </div>
 
           <div className="flex items-center gap-4">
+            {onShowHelp && (
+              <button
+                onClick={onShowHelp}
+                className="flex items-center gap-2 px-4 py-2 text-white hover:bg-white/10 rounded transition-colors"
+                title="Help Center"
+              >
+                <HelpCircle size={20} />
+                <span className="text-sm">Help</span>
+              </button>
+            )}
             <button
               onClick={() => onNavigate?.('reports')}
               className="px-4 py-2 border border-white text-white text-sm font-normal rounded hover:bg-white/10 transition-colors"

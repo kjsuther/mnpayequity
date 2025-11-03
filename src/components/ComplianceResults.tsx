@@ -1,5 +1,7 @@
-import { CheckCircle, XCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { CheckCircle, XCircle, AlertCircle, ArrowLeft, HelpCircle } from 'lucide-react';
 import { ComplianceResult } from '../lib/complianceAnalysis';
+import { ComplianceTroubleshooting } from './ComplianceTroubleshooting';
 
 type ComplianceResultsProps = {
   results: ComplianceResult;
@@ -10,6 +12,8 @@ type ComplianceResultsProps = {
 };
 
 export function ComplianceResults({ results: result, onBack, reportYear, showBackButton = true, onProceedToImplementation }: ComplianceResultsProps) {
+  const [showTroubleshooting, setShowTroubleshooting] = useState(false);
+
   return (
     <div className="space-y-6">
       {showBackButton && (
@@ -224,6 +228,18 @@ export function ComplianceResults({ results: result, onBack, reportYear, showBac
         </>
       )}
 
+      {!result.isCompliant && (
+        <div className="flex justify-center">
+          <button
+            onClick={() => setShowTroubleshooting(true)}
+            className="flex items-center gap-2 px-6 py-3 border-2 border-[#003865] text-[#003865] rounded-lg hover:bg-blue-50 transition-colors font-medium"
+          >
+            <HelpCircle className="w-5 h-5" />
+            Get Help with Compliance Issues
+          </button>
+        </div>
+      )}
+
       {onProceedToImplementation && (
         <div className="flex justify-end">
           <button
@@ -236,6 +252,13 @@ export function ComplianceResults({ results: result, onBack, reportYear, showBac
       )}
 
       </div>
+
+      {showTroubleshooting && (
+        <ComplianceTroubleshooting
+          complianceResult={result}
+          onClose={() => setShowTroubleshooting(false)}
+        />
+      )}
     </div>
   );
 }

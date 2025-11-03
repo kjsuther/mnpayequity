@@ -1,4 +1,5 @@
-import { FileText, AlertCircle, CheckCircle, Calendar } from 'lucide-react';
+import { useState } from 'react';
+import { FileText, AlertCircle, CheckCircle, Calendar, BookOpen, ClipboardCheck } from 'lucide-react';
 import { Report, Jurisdiction } from '../lib/supabase';
 
 type DashboardProps = {
@@ -6,9 +7,10 @@ type DashboardProps = {
   reports: Report[];
   onManageReports: () => void;
   onViewReport: (report: Report) => void;
+  onShowDataGuide: () => void;
 };
 
-export function Dashboard({ jurisdiction, reports, onManageReports, onViewReport }: DashboardProps) {
+export function Dashboard({ jurisdiction, reports, onManageReports, onViewReport, onShowDataGuide }: DashboardProps) {
   const submittedReports = reports.filter(r => r.case_status === 'Submitted');
   const draftReports = reports.filter(r => r.case_status === 'Private' || r.case_status === 'Shared');
   const compliantReports = reports.filter(r => r.compliance_status === 'In Compliance');
@@ -98,6 +100,13 @@ export function Dashboard({ jurisdiction, reports, onManageReports, onViewReport
           >
             <span className="font-medium">Manage Pay Equity Reports</span>
             <FileText className="w-5 h-5" />
+          </button>
+          <button
+            onClick={onShowDataGuide}
+            className="w-full flex items-center justify-between px-4 py-3 border-2 border-[#003865] text-[#003865] rounded-lg hover:bg-blue-50 transition-colors"
+          >
+            <span className="font-medium">Data Gathering Checklist</span>
+            <ClipboardCheck className="w-5 h-5" />
           </button>
         </div>
       </div>

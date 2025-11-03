@@ -19,6 +19,9 @@ import { JobDataEntryListPage } from './JobDataEntryListPage';
 import { ComplianceReportPage } from './ComplianceReportPage';
 import { PredictedPayReportPage } from './PredictedPayReportPage';
 import { ImplementationReportPage } from './ImplementationReportPage';
+import { WelcomeTutorial } from './WelcomeTutorial';
+import { HelpCenter } from './HelpCenter';
+import { DataGatheringGuide } from './DataGatheringGuide';
 import { supabase, type Jurisdiction, type Contact, type Report, type JobClassification, type ImplementationReport } from '../lib/supabase';
 import { analyzeCompliance, type ComplianceResult } from '../lib/complianceAnalysis';
 
@@ -28,7 +31,7 @@ export function MainApp() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide'>('home');
   const [reportViewType, setReportViewType] = useState<'jobDataEntry' | 'compliance' | 'predictedPay' | 'implementation' | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
@@ -37,6 +40,15 @@ export function MainApp() {
   const [jobs, setJobs] = useState<JobClassification[]>([]);
   const [complianceResult, setComplianceResult] = useState<ComplianceResult | null>(null);
   const [implementationData, setImplementationData] = useState<ImplementationReport | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [showHelpCenter, setShowHelpCenter] = useState(false);
+
+  useEffect(() => {
+    const tutorialCompleted = localStorage.getItem('payEquityTutorialCompleted');
+    if (!tutorialCompleted) {
+      setShowTutorial(true);
+    }
+  }, []);
 
   useEffect(() => {
     loadJurisdictions();
@@ -357,7 +369,7 @@ export function MainApp() {
     );
   }
 
-  function handleNavigate(view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView') {
+  function handleNavigate(view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide') {
     if (view === 'jobs') {
       if (!currentJurisdiction) {
         alert('Please select a jurisdiction first.');
@@ -408,6 +420,7 @@ export function MainApp() {
         onNavigate={handleNavigate}
         hasActiveReport={!!selectedReport}
         hasActiveJurisdiction={!!currentJurisdiction}
+        onShowHelp={() => setShowHelpCenter(true)}
       />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
@@ -424,6 +437,8 @@ export function MainApp() {
             jurisdiction={currentJurisdiction}
             onBack={() => setCurrentView('home')}
           />
+        ) : currentView === 'dataGuide' ? (
+          <DataGatheringGuide onBack={() => setCurrentView('home')} />
         ) : currentView === 'dashboard' && currentJurisdiction ? (
           <Dashboard
             jurisdiction={currentJurisdiction}
@@ -433,6 +448,7 @@ export function MainApp() {
               setSelectedReport(report);
               setCurrentView('reports');
             }}
+            onShowDataGuide={() => setCurrentView('dataGuide')}
           />
         ) : currentView === 'reports' && currentJurisdiction ? (
           <ReportManagement
@@ -540,6 +556,20 @@ export function MainApp() {
         isOpen={isAddJurisdictionModalOpen}
         onClose={() => setIsAddJurisdictionModalOpen(false)}
         onSave={handleSaveJurisdiction}
+      />
+
+      <WelcomeTutorial
+        isOpen={showTutorial}
+        onClose={() => {
+          setShowTutorial(false);
+          localStorage.setItem('payEquityTutorialCompleted', 'true');
+        }}
+      />
+
+      <HelpCenter
+        isOpen={showHelpCenter}
+        onClose={() => setShowHelpCenter(false)}
+        context={currentView}
       />
     </div>
   );
