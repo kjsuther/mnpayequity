@@ -11,6 +11,7 @@ import { ComplianceResults } from './ComplianceResults';
 import { ImplementationForm } from './ImplementationForm';
 import { ReportExportMenu } from './ReportExportMenu';
 import { SuccessModal } from './SuccessModal';
+import { ReportNotes } from './ReportNotes';
 import { analyzeCompliance, ComplianceResult } from '../lib/complianceAnalysis';
 
 type ReportManagementProps = {
@@ -27,7 +28,7 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
   const [jobs, setJobs] = useState<JobClassification[]>([]);
   const [implementationData, setImplementationData] = useState<ImplementationReport | null>(null);
   const [complianceResult, setComplianceResult] = useState<ComplianceResult | null>(null);
-  const [currentView, setCurrentView] = useState<'jobs' | 'compliance' | 'implementation'>('jobs');
+  const [currentView, setCurrentView] = useState<'jobs' | 'compliance' | 'implementation' | 'notes'>('jobs');
   const [isAddReportModalOpen, setIsAddReportModalOpen] = useState(false);
   const [isCopyJobsModalOpen, setIsCopyJobsModalOpen] = useState(false);
   const [isImportJobsModalOpen, setIsImportJobsModalOpen] = useState(false);
@@ -503,6 +504,16 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
               >
                 Implementation Form
               </button>
+              <button
+                onClick={() => setCurrentView('notes')}
+                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${
+                  currentView === 'notes'
+                    ? 'bg-[#003865] text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                Notes
+              </button>
             </div>
           </div>
 
@@ -570,6 +581,10 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
               onSave={handleSaveImplementation}
               onSubmit={handleSubmitReport}
             />
+          )}
+
+          {currentView === 'notes' && (
+            <ReportNotes reportId={currentReport.id} />
           )}
 
           {currentReport && jobs.length > 0 && onNavigateToReportView && (
