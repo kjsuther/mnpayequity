@@ -333,6 +333,7 @@ export function TestResultsPage({ jurisdiction, onBack }: TestResultsPageProps) 
               onBack={handleViewAnotherCase}
               reportYear={selectedReport?.report_year || 0}
               showBackButton={false}
+              jobs={jobs}
             />
 
             <div className="flex justify-center gap-4 print:hidden">

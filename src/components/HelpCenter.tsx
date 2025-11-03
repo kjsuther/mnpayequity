@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Book, FileQuestion, Mail, ExternalLink, ChevronRight } from 'lucide-react';
+import { Search, Book, FileQuestion, Mail, ExternalLink, ChevronRight, FileText, Download } from 'lucide-react';
 
 type HelpCenterProps = {
   isOpen: boolean;
@@ -13,29 +13,53 @@ type HelpArticle = {
   category: string;
   content: string;
   keywords: string[];
+  pdfUrl?: string;
+  whenToUse?: string;
 };
 
 const helpArticles: HelpArticle[] = [
+  {
+    id: 'pdf-submission',
+    title: 'Instructions for Submitting a Local Government Pay Equity Report',
+    category: 'Official Documents',
+    content: 'This comprehensive official guide from Minnesota Management & Budget provides complete step-by-step instructions for submitting your local government pay equity report.\n\nWhat\'s Covered:\n• Report submission deadlines and procedures\n• Required forms and documentation\n• Data reporting requirements\n• Common submission errors to avoid\n• Contact information for assistance\n• Compliance certification requirements\n\nThis is your primary reference for understanding what must be submitted and how to properly complete your annual report.',
+    pdfUrl: 'https://mn.gov/mmb-stat/pay-equity/Instructions%20for%20submitting%20a%20local%20government%20pay%20equity%20report.pdf',
+    whenToUse: 'Reference this document when preparing to submit your annual report, verifying submission requirements, or if you receive questions from MMB about your submission.',
+    keywords: ['instructions', 'submit', 'submission', 'requirements', 'how to', 'guide', 'pdf', 'forms', 'deadline'],
+  },
+  {
+    id: 'pdf-job-match',
+    title: 'State Job Match Evaluation System Guide (2023)',
+    category: 'Official Documents',
+    content: 'The official State Job Match Evaluation System guide explains how to properly evaluate and assign point values to your job classifications.\n\nWhat\'s Covered:\n• The four evaluation factors: Skill, Effort, Responsibility, and Working Conditions\n• Point assignment methodology and examples\n• Comparison with state job classifications\n• Guidelines for consistent evaluation across all jobs\n• Common job titles and their typical point ranges\n• How to handle unique or specialized positions\n\nThis system ensures objective, consistent job evaluation that stands up to compliance review.',
+    pdfUrl: 'https://mn.gov/mmb-stat/pay-equity/State%20Job%20Match%20Evaluation%20System-%202023.pdf',
+    whenToUse: 'Use this guide when entering job classifications for the first time, evaluating new positions, or if your point assignments are questioned during a review.',
+    keywords: ['points', 'evaluation', 'job match', 'state system', 'classification', '2023', 'skill', 'effort', 'responsibility', 'working conditions'],
+  },
+  {
+    id: 'pdf-understand-compliance',
+    title: 'Guide to Understanding Pay Equity Compliance',
+    category: 'Official Documents',
+    content: 'This essential guide explains what pay equity compliance means, how the statistical tests work, and what actions you should take based on your results.\n\nWhat\'s Covered:\n• Definition of pay equity compliance\n• Explanation of the three compliance tests\n• Understanding the 80% threshold\n• What it means to be "in compliance" vs "out of compliance"\n• Required corrective actions for non-compliance\n• Implementation timelines and planning\n• Working with the MMB Pay Equity Unit\n\nEveryone involved in pay equity reporting should read this guide to understand the goals and requirements.',
+    pdfUrl: 'https://mn.gov/mmb-stat/pay-equity/guide-understand-compl.pdf',
+    whenToUse: 'Essential reading before running your first compliance analysis, when explaining results to leadership, or when planning corrective actions for non-compliance.',
+    keywords: ['compliance', 'understanding', 'guide', 'requirements', 'tests', '80%', 'threshold', 'corrective action'],
+  },
+  {
+    id: 'pdf-interpret-results',
+    title: 'How to Interpret Your Pay Equity Results',
+    category: 'Official Documents',
+    content: 'Detailed technical guide for understanding and interpreting the results of your pay equity compliance analysis.\n\nWhat\'s Covered:\n• Statistical Analysis Test interpretation\n• Salary Range Test calculations and meaning\n• Exceptional Service Pay Test analysis\n• Understanding the predicted pay line\n• Identifying problematic job classifications\n• Calculating required salary adjustments\n• Documentation requirements for implementation plans\n\nThis guide helps you move from test results to actionable compliance strategies.',
+    pdfUrl: 'https://mn.gov/mmb-stat/pay-equity/interpret-results-pay%20equity.pdf',
+    whenToUse: 'Refer to this after running your compliance analysis to understand what the numbers mean and determine next steps for addressing any issues.',
+    keywords: ['results', 'interpret', 'tests', 'analysis', 'understand', 'statistical', 'salary range', 'exceptional service', 'predicted pay'],
+  },
   {
     id: '1',
     title: 'What is the Minnesota Local Government Pay Equity Act?',
     category: 'Getting Started',
     content: 'The Minnesota Local Government Pay Equity Act (Minnesota Statutes 471.991-471.999) requires local governments to ensure equitable compensation between female-dominated and male-dominated job classes of comparable work value. All political subdivisions with more than one female job class must submit annual pay equity reports. For complete details, visit: https://mn.gov/mmb/employee-relations/labor-relations/pay-equity/local-government/',
     keywords: ['law', 'act', 'requirements', 'basics', 'overview'],
-  },
-  {
-    id: '1b',
-    title: 'Official Submission Instructions PDF',
-    category: 'Getting Started',
-    content: 'Download the complete instructions for submitting your local government pay equity report. This comprehensive PDF from Minnesota Management & Budget covers all requirements, deadlines, and submission procedures. Access it at: https://mn.gov/mmb-stat/pay-equity/Instructions%20for%20submitting%20a%20local%20government%20pay%20equity%20report.pdf',
-    keywords: ['instructions', 'submit', 'submission', 'requirements', 'how to', 'guide', 'pdf'],
-  },
-  {
-    id: '1c',
-    title: 'State Job Match Evaluation System Guide',
-    category: 'Job Evaluation',
-    content: 'The State Job Match system helps you evaluate job classifications and assign points based on skill, effort, responsibility, and working conditions. Download the detailed 2023 guide at: https://mn.gov/mmb-stat/pay-equity/State%20Job%20Match%20Evaluation%20System-%202023.pdf',
-    keywords: ['points', 'evaluation', 'job match', 'state system', 'classification', '2023'],
   },
   {
     id: '2',
@@ -242,9 +266,34 @@ export function HelpCenter({ isOpen, onClose, context }: HelpCenterProps) {
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
                     {selectedArticle.title}
                   </h2>
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+
+                  {selectedArticle.pdfUrl && (
+                    <a
+                      href={selectedArticle.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 mb-4 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors text-sm font-medium"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download Official PDF
+                    </a>
+                  )}
+
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line mb-6">
                     {selectedArticle.content}
                   </p>
+
+                  {selectedArticle.whenToUse && (
+                    <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+                      <h3 className="text-sm font-semibold text-green-900 mb-2 flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        When to Use This Document
+                      </h3>
+                      <p className="text-sm text-green-800">
+                        {selectedArticle.whenToUse}
+                      </p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div>
