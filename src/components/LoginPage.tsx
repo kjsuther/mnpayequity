@@ -275,7 +275,8 @@ export function LoginPage() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-600">Office Hours:</p>
-                          <p className="text-gray-700">Monday-Friday, 8:00 AM - 4:30 PM Central Time</p>
+                          <p className="text-gray-700">Monday - Friday</p>
+                          <p className="text-gray-700">8:00 AM - 4:30 PM Central Time</p>
                         </div>
                       </div>
                     </div>
