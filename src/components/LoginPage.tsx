@@ -247,7 +247,41 @@ export function LoginPage() {
                   </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {isSignUp ? (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 space-y-4">
+                    <div className="text-center">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">New User Registration</h3>
+                      <p className="text-gray-700 mb-4">
+                        If you are a new user, please contact the MMB Pay Equity Unit to register:
+                      </p>
+                      <div className="space-y-3 text-left bg-white rounded-lg p-4 border border-blue-300">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Email:</p>
+                          <a
+                            href="mailto:payequity.mmb@state.mn.us"
+                            className="text-[#003865] hover:text-[#78BE21] font-semibold transition-colors"
+                          >
+                            payequity.mmb@state.mn.us
+                          </a>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Phone:</p>
+                          <a
+                            href="tel:651-259-3824"
+                            className="text-[#003865] hover:text-[#78BE21] font-semibold transition-colors"
+                          >
+                            651-259-3824
+                          </a>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Office Hours:</p>
+                          <p className="text-gray-700">Monday-Friday, 8:00 AM - 4:30 PM Central Time</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address *
@@ -358,9 +392,10 @@ export function LoginPage() {
                     disabled={loading}
                     className="w-full bg-gradient-to-r from-[#003865] to-[#004d7a] text-white py-3 rounded-lg font-semibold hover:from-[#004d7a] hover:to-[#003865] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
+                    {loading ? 'Please wait...' : 'Sign In'}
                   </button>
                 </form>
+                )}
 
                 {!isSignUp && (
                   <div className="mt-4 text-center space-y-2">
