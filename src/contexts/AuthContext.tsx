@@ -99,15 +99,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .eq('user_id', data.user.id)
           .maybeSingle();
 
-        if (profile && !profile.is_admin && profile.jurisdiction_id !== jurisdictionId) {
-          await supabase.auth.signOut();
-          return { error: new Error('Selected jurisdiction does not match your account') };
+        if (profile && !profile.is_admin) {
+          if (!jurisdictionId) {
+            await supabase.auth.signOut();
+            return { error: new Error('Please select your jurisdiction') };
+          }
+          if (profile.jurisdiction_id !== jurisdictionId) {
+            await supabase.auth.signOut();
+            return { error: new Error('Selected jurisdiction does not match your account') };
+          }
         }
 
-        await supabase
-          .from('user_profiles')
-          .update({ jurisdiction_id: jurisdictionId, updated_at: new Date().toISOString() })
-          .eq('user_id', data.user.id);
+        if (jurisdictionId) {
+          await supabase
+            .from('user_profiles')
+            .update({ jurisdiction_id: jurisdictionId, updated_at: new Date().toISOString() })
+            .eq('user_id', data.user.id);
+        }
       }
 
       return { error: null };
