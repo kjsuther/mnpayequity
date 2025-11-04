@@ -19,6 +19,7 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [showComprehensiveGuide, setShowComprehensiveGuide] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const utilitiesRef = useRef<HTMLLIElement>(null);
   const goToRef = useRef<HTMLLIElement>(null);
   const adminRef = useRef<HTMLLIElement>(null);
@@ -45,9 +46,12 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
   }, []);
 
   const handleSignOut = async () => {
-    if (confirm('Are you sure you want to log out?')) {
-      await signOut();
-    }
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmSignOut = async () => {
+    setShowLogoutConfirm(false);
+    await signOut();
   };
 
   const handleChangePassword = () => {
@@ -285,6 +289,35 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
 
       {showComprehensiveGuide && (
         <ComprehensiveHelpGuide onClose={() => setShowComprehensiveGuide(false)} />
+      )}
+
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Confirm Logout
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to log out?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSignOut}
+                  className="flex-1 px-4 py-2 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors font-medium"
+                >
+                  Log Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </header>
   );
