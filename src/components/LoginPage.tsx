@@ -139,9 +139,10 @@ export function LoginPage() {
               <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="font-semibold text-blue-900 mb-2">Getting Started</h3>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• First-time users should create an account using their jurisdiction ID</li>
-                  <li>• If you forgot your jurisdiction ID, contact your administrator</li>
-                  <li>• Check your email after registration to verify your account</li>
+                  <li>• New users must contact the MMB Pay Equity Unit to have an account created</li>
+                  <li>• Once your account is created, sign in using your email and the password you were provided</li>
+                  <li>• Select your jurisdiction from the dropdown when signing in</li>
+                  <li>• If you forgot your password, use the "Forgot Password?" link below</li>
                 </ul>
                 <button
                   onClick={() => setShowInstructions(false)}
