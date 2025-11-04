@@ -22,7 +22,7 @@ export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
     email: '',
     password: '',
     jurisdiction_id: '',
-    is_admin: false,
+    role: 'User' as 'User' | 'Admin' | 'IT',
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -71,7 +71,7 @@ export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
       email: '',
       password: '',
       jurisdiction_id: '',
-      is_admin: false,
+      role: 'User',
     });
     setError(null);
     setSuccess(null);
@@ -80,11 +80,12 @@ export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
 
   const handleEditUser = (user: UserProfile) => {
     setEditingUser(user);
+    const userRole = (user as any).role || (user.is_admin ? 'Admin' : 'User');
     setFormData({
       email: user.email,
       password: '',
       jurisdiction_id: user.jurisdiction_id || '',
-      is_admin: user.is_admin,
+      role: userRole,
     });
     setError(null);
     setSuccess(null);
@@ -101,7 +102,8 @@ export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
       if (editingUser) {
         const updates: any = {
           jurisdiction_id: formData.jurisdiction_id || null,
-          is_admin: formData.is_admin,
+          role: formData.role,
+          is_admin: formData.role === 'Admin' || formData.role === 'IT',
           updated_at: new Date().toISOString(),
         };
 
@@ -136,7 +138,8 @@ export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
             .from('user_profiles')
             .update({
               jurisdiction_id: formData.jurisdiction_id || null,
-              is_admin: formData.is_admin,
+              role: formData.role,
+              is_admin: formData.role === 'Admin' || formData.role === 'IT',
             })
             .eq('user_id', authData.user.id);
 
@@ -281,12 +284,14 @@ export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            user.is_admin
-                              ? 'bg-purple-100 text-purple-800'
+                            (user as any).role === 'Admin'
+                              ? 'bg-red-100 text-red-800'
+                              : (user as any).role === 'IT'
+                              ? 'bg-yellow-100 text-yellow-800'
                               : 'bg-blue-100 text-blue-800'
                           }`}
                         >
-                          {user.is_admin ? 'Administrator' : 'User'}
+                          {(user as any).role || (user.is_admin ? 'Admin' : 'User')}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -373,7 +378,7 @@ export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
                   value={formData.jurisdiction_id}
                   onChange={(e) => setFormData({ ...formData, jurisdiction_id: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#003865] focus:border-transparent"
-                  disabled={formData.is_admin}
+                  disabled={formData.role === 'Admin' || formData.role === 'IT'}
                 >
                   <option value="">Select Jurisdiction</option>
                   {jurisdictions.map((jurisdiction) => (
@@ -388,24 +393,29 @@ export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
               </div>
 
               <div>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_admin}
-                    onChange={(e) => {
-                      const isAdmin = e.target.checked;
-                      setFormData({
-                        ...formData,
-                        is_admin: isAdmin,
-                        jurisdiction_id: isAdmin ? '' : formData.jurisdiction_id,
-                      });
-                    }}
-                    className="rounded border-gray-300 text-[#003865] focus:ring-[#003865]"
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    Administrator (full system access)
-                  </span>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Role *
                 </label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => {
+                    const role = e.target.value as 'User' | 'Admin' | 'IT';
+                    setFormData({
+                      ...formData,
+                      role,
+                      jurisdiction_id: (role === 'Admin' || role === 'IT') ? '' : formData.jurisdiction_id,
+                    });
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                  required
+                >
+                  <option value="User">User - Standard access to assigned jurisdiction</option>
+                  <option value="Admin">Admin - Full system access to all jurisdictions</option>
+                  <option value="IT">IT - Technical support and system maintenance</option>
+                </select>
+                <p className="mt-1 text-xs text-gray-500">
+                  Admin and IT roles have access to all jurisdictions
+                </p>
               </div>
 
               {error && (

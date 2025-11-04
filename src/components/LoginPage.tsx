@@ -86,11 +86,14 @@ export function LoginPage() {
           setError('Account created successfully! You can now sign in.');
         }
       } else {
-        if (!jurisdictionId.trim()) {
+        const isAdminEmail = email.toLowerCase() === 'admin@admin.com';
+
+        if (!isAdminEmail && !jurisdictionId.trim()) {
           setError('Please select your jurisdiction');
           setLoading(false);
           return;
         }
+
         const { error } = await signIn(email, password, jurisdictionId);
         if (error) {
           setError(error.message);
