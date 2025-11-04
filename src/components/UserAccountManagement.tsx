@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Jurisdiction } from '../lib/supabase';
 import type { UserProfile } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { ArrowLeft, Plus, Edit2, Trash2, X, AlertCircle, CheckCircle } from 'lucide-react';
 
 type UserAccountManagementProps = {
@@ -13,6 +14,7 @@ type UserAccountWithAuth = UserProfile & {
 };
 
 export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
+  const { userProfile } = useAuth();
   const [users, setUsers] = useState<UserAccountWithAuth[]>([]);
   const [jurisdictions, setJurisdictions] = useState<Jurisdiction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +29,8 @@ export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const isAdminOrIT = userProfile?.role === 'Admin' || userProfile?.role === 'IT' || userProfile?.is_admin;
 
   useEffect(() => {
     loadUsers();
@@ -190,6 +194,34 @@ export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
     const jurisdiction = jurisdictions.find(j => j.jurisdiction_id === jurisdictionId);
     return jurisdiction ? jurisdiction.name : jurisdictionId;
   };
+
+  if (!isAdminOrIT) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 text-[#003865] hover:text-[#78BE21] transition-colors"
+          >
+            <ArrowLeft size={20} />
+            <span className="font-medium">Back to Dashboard</span>
+          </button>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div className="text-center">
+            <AlertCircle size={48} className="text-red-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+            <p className="text-gray-600 mb-6">
+              You don't have permission to access User Account Management. This feature is only available to Admin and IT users.
+            </p>
+            <p className="text-sm text-gray-500">
+              Current role: <span className="font-semibold">{userProfile?.role || 'User'}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
