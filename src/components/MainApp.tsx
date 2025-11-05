@@ -25,7 +25,6 @@ import { HelpCenter } from './HelpCenter';
 import { DataGatheringGuide } from './DataGatheringGuide';
 import { UserAccountManagement } from './UserAccountManagement';
 import { MNPayEquity } from './MNPayEquity';
-import { JurisdictionApprovalPage } from './JurisdictionApprovalPage';
 import { supabase, type Jurisdiction, type Contact, type Report, type JobClassification, type ImplementationReport } from '../lib/supabase';
 import { analyzeCompliance, type ComplianceResult } from '../lib/complianceAnalysis';
 
@@ -36,7 +35,7 @@ export function MainApp() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement' | 'mnPayEquity' | 'jurisdictionApproval'>('dashboard');
+  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement' | 'mnPayEquity'>('dashboard');
   const [reportViewType, setReportViewType] = useState<'jobDataEntry' | 'compliance' | 'predictedPay' | 'implementation' | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
@@ -383,7 +382,7 @@ export function MainApp() {
     );
   }
 
-  function handleNavigate(view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement' | 'mnPayEquity' | 'jurisdictionApproval') {
+  function handleNavigate(view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement' | 'mnPayEquity') {
     if (view === 'jobs') {
       if (!currentJurisdiction) {
         alert('Please select a jurisdiction first.');
@@ -458,8 +457,6 @@ export function MainApp() {
           <UserAccountManagement onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'mnPayEquity' ? (
           <MNPayEquity onBack={() => setCurrentView('dashboard')} />
-        ) : currentView === 'jurisdictionApproval' ? (
-          <JurisdictionApprovalPage onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'dashboard' ? (
           currentJurisdiction ? (
             <Dashboard
@@ -471,7 +468,6 @@ export function MainApp() {
                 setCurrentView('reports');
               }}
               onShowDataGuide={() => setCurrentView('dataGuide')}
-              onNavigateToApproval={() => setCurrentView('jurisdictionApproval')}
             />
           ) : (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">

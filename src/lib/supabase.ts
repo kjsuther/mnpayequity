@@ -19,11 +19,6 @@ export type Jurisdiction = {
   next_report_year: number | null;
   follow_up_type: string;
   follow_up_date: string | null;
-  approval_status: 'pending' | 'approved' | 'rejected';
-  approved_by: string | null;
-  approved_at: string | null;
-  rejection_reason: string | null;
-  status_notes: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -143,23 +138,12 @@ export type BenefitsWorksheet = {
 export type EmailTemplate = {
   id: string;
   name: string;
-  type: 'announcement' | 'fail_to_report' | 'jurisdiction_approved' | 'jurisdiction_rejected' | 'admin_fail_notification';
+  type: 'announcement' | 'fail_to_report';
   subject: string;
   body: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
-};
-
-export type JurisdictionStatusHistory = {
-  id: string;
-  jurisdiction_id: string;
-  old_status: string | null;
-  new_status: string;
-  changed_by: string;
-  change_reason: string | null;
-  notes: string | null;
-  created_at: string;
 };
 
 export type EmailLog = {

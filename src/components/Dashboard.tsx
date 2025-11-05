@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
-import { FileText, AlertCircle, CheckCircle, Calendar, BookOpen, ClipboardCheck, Clock } from 'lucide-react';
-import { Report, Jurisdiction, supabase } from '../lib/supabase';
+import { useState } from 'react';
+import { FileText, AlertCircle, CheckCircle, Calendar, BookOpen, ClipboardCheck } from 'lucide-react';
+import { Report, Jurisdiction } from '../lib/supabase';
 import { FilteredReportModal } from './FilteredReportModal';
-import { useAuth } from '../contexts/AuthContext';
 
 type DashboardProps = {
   jurisdiction: Jurisdiction;
@@ -10,16 +9,13 @@ type DashboardProps = {
   onManageReports: () => void;
   onViewReport: (report: Report) => void;
   onShowDataGuide: () => void;
-  onNavigateToApproval?: () => void;
 };
 
 type FilterType = 'all' | 'submitted' | 'drafts' | 'compliant' | null;
 
-export function Dashboard({ jurisdiction, reports, onManageReports, onViewReport, onShowDataGuide, onNavigateToApproval }: DashboardProps) {
-  const { isAdmin } = useAuth();
+export function Dashboard({ jurisdiction, reports, onManageReports, onViewReport, onShowDataGuide }: DashboardProps) {
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [currentFilter, setCurrentFilter] = useState<FilterType>(null);
-  const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
 
   const submittedReports = reports.filter(r => r.case_status === 'Submitted');
   const draftReports = reports.filter(r => r.case_status === 'Private' || r.case_status === 'Shared');
@@ -64,26 +60,6 @@ export function Dashboard({ jurisdiction, reports, onManageReports, onViewReport
   const currentYear = new Date().getFullYear();
   const nextReportYear = jurisdiction.next_report_year || currentYear;
   const hasCurrentYearReport = reports.some(r => r.report_year === currentYear);
-
-  useEffect(() => {
-    if (isAdmin) {
-      loadPendingApprovals();
-    }
-  }, [isAdmin]);
-
-  async function loadPendingApprovals() {
-    try {
-      const { data, error } = await supabase
-        .from('jurisdictions')
-        .select('id', { count: 'exact', head: true })
-        .eq('approval_status', 'pending');
-
-      if (error) throw error;
-      setPendingApprovalsCount(data?.length || 0);
-    } catch (error) {
-      console.error('Error loading pending approvals:', error);
-    }
-  }
 
   return (
     <div className="space-y-6">
@@ -142,26 +118,6 @@ export function Dashboard({ jurisdiction, reports, onManageReports, onViewReport
           <p className="text-xs text-gray-500 mt-2 group-hover:text-green-600 transition-colors">Click to view all</p>
         </button>
       </div>
-
-      {isAdmin && pendingApprovalsCount > 0 && onNavigateToApproval && (
-        <button
-          onClick={onNavigateToApproval}
-          className="w-full bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg hover:bg-yellow-100 transition-colors text-left cursor-pointer group"
-        >
-          <div className="flex items-start gap-3">
-            <Clock className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-yellow-800">Admin: Pending Jurisdiction Approvals</h3>
-              <p className="text-sm text-yellow-700 mt-1">
-                {pendingApprovalsCount} jurisdiction{pendingApprovalsCount !== 1 ? 's' : ''} waiting for approval. Click to review.
-              </p>
-            </div>
-            <div className="text-yellow-600 group-hover:translate-x-1 transition-transform">
-              →
-            </div>
-          </div>
-        </button>
-      )}
 
       {!hasCurrentYearReport && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
