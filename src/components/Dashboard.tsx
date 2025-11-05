@@ -77,17 +77,57 @@ export function Dashboard({ jurisdiction, reports, onManageReports, onViewReport
       )}
 
       {outOfComplianceReports.length > 0 && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="text-sm font-medium text-red-800">Action Required</h3>
-              <p className="text-sm text-red-700 mt-1">
-                You have {outOfComplianceReports.length} report{outOfComplianceReports.length > 1 ? 's' : ''} out of compliance.
-                Please review and take necessary action to address pay equity gaps.
-              </p>
+        <div className="bg-red-50 border-l-4 border-red-400 rounded-r-lg overflow-hidden">
+          {outOfComplianceReports.length === 1 ? (
+            <button
+              onClick={() => onViewReport(outOfComplianceReports[0])}
+              className="w-full p-4 text-left hover:bg-red-100 transition-colors cursor-pointer group"
+            >
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="text-sm font-medium text-red-800">Action Required</h3>
+                  <p className="text-sm text-red-700 mt-1">
+                    You have 1 report out of compliance. Click to review and take necessary action to address pay equity gaps.
+                  </p>
+                  <p className="text-sm text-red-800 font-medium mt-2">
+                    {outOfComplianceReports[0].report_year} - Case {outOfComplianceReports[0].case_number}: {outOfComplianceReports[0].case_description}
+                  </p>
+                </div>
+                <div className="text-red-600 group-hover:translate-x-1 transition-transform">
+                  →
+                </div>
+              </div>
+            </button>
+          ) : (
+            <div className="p-4">
+              <div className="flex items-start gap-3 mb-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-medium text-red-800">Action Required</h3>
+                  <p className="text-sm text-red-700 mt-1">
+                    You have {outOfComplianceReports.length} reports out of compliance. Click on any report below to review and take action.
+                  </p>
+                </div>
+              </div>
+              <div className="ml-8 space-y-2">
+                {outOfComplianceReports.map((report) => (
+                  <button
+                    key={report.id}
+                    onClick={() => onViewReport(report)}
+                    className="w-full text-left px-3 py-2 bg-white border border-red-200 rounded hover:bg-red-50 hover:border-red-300 transition-colors group flex items-center justify-between"
+                  >
+                    <span className="text-sm text-red-800 font-medium">
+                      {report.report_year} - Case {report.case_number}: {report.case_description}
+                    </span>
+                    <span className="text-red-600 group-hover:translate-x-1 transition-transform">
+                      →
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
