@@ -6,6 +6,7 @@ import { AddJobModal } from './AddJobModal';
 import { JobEntryMethodModal } from './JobEntryMethodModal';
 import { CopyJobsModal } from './CopyJobsModal';
 import { ImportJobsModal } from './ImportJobsModal';
+import { AddReportModal } from './AddReportModal';
 
 type JobsPageProps = {
   jurisdiction: Jurisdiction;
@@ -28,6 +29,7 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
   const [isAddingInline, setIsAddingInline] = useState(false);
   const [newJob, setNewJob] = useState<Partial<JobClassification>>({});
   const inlineEditRowRef = useRef<HTMLTableRowElement>(null);
+  const [isAddReportModalOpen, setIsAddReportModalOpen] = useState(false);
 
   useEffect(() => {
     loadReports();
@@ -1031,7 +1033,13 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
         </div>
 
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#78BE21] text-white rounded-lg hover:bg-[#6ba51c] transition-colors text-sm font-medium">
+          <button
+            onClick={() => {
+              console.log('Add New Case clicked in JobsPage');
+              setIsAddReportModalOpen(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-[#78BE21] text-white rounded-lg hover:bg-[#6ba51c] transition-colors text-sm font-medium"
+          >
             <Plus size={18} />
             Add New Case
           </button>
@@ -1046,6 +1054,16 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
           setEditingReport(null);
         }}
         onSave={handleSaveCaseDesc}
+      />
+
+      <AddReportModal
+        isOpen={isAddReportModalOpen}
+        onClose={() => setIsAddReportModalOpen(false)}
+        jurisdictionId={jurisdiction.id}
+        onReportAdded={async () => {
+          await loadReports();
+          setIsAddReportModalOpen(false);
+        }}
       />
     </div>
   );
