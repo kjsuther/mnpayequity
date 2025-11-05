@@ -37,20 +37,12 @@ export function ReportList({
           <h2 className="text-lg font-semibold text-gray-900">Pay Equity Reports</h2>
         </div>
         <button
-          onClick={(e) => {
-            console.log('Button clicked', e);
-            console.log('onAddReport type:', typeof onAddReport);
-            if (onAddReport) {
-              onAddReport();
-            } else {
-              console.error('onAddReport is not defined');
-            }
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors relative z-10"
+          onClick={onAddReport}
+          className="flex items-center gap-2 px-4 py-2 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors"
           type="button"
         >
           <Plus className="w-4 h-4" />
-          ✓ Add New Case [v2]
+          Add New Case
         </button>
       </div>
 
