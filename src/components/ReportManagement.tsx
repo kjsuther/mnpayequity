@@ -30,6 +30,10 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
   const [complianceResult, setComplianceResult] = useState<ComplianceResult | null>(null);
   const [currentView, setCurrentView] = useState<'jobs' | 'compliance' | 'implementation' | 'notes'>('jobs');
   const [isAddReportModalOpen, setIsAddReportModalOpen] = useState(false);
+
+  useEffect(() => {
+    console.log('isAddReportModalOpen changed:', isAddReportModalOpen);
+  }, [isAddReportModalOpen]);
   const [isCopyJobsModalOpen, setIsCopyJobsModalOpen] = useState(false);
   const [isImportJobsModalOpen, setIsImportJobsModalOpen] = useState(false);
   const [showJobOptions, setShowJobOptions] = useState(false);
@@ -600,9 +604,13 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
         </div>
       )}
 
+      {console.log('Rendering AddReportModal, isOpen:', isAddReportModalOpen)}
       <AddReportModal
         isOpen={isAddReportModalOpen}
-        onClose={() => setIsAddReportModalOpen(false)}
+        onClose={() => {
+          console.log('Closing modal');
+          setIsAddReportModalOpen(false);
+        }}
         onSave={handleAddReport}
       />
 

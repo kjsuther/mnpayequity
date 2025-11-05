@@ -37,7 +37,15 @@ export function ReportList({
           <h2 className="text-lg font-semibold text-gray-900">Pay Equity Reports</h2>
         </div>
         <button
-          onClick={onAddReport}
+          onClick={(e) => {
+            console.log('Button clicked', e);
+            console.log('onAddReport type:', typeof onAddReport);
+            if (onAddReport) {
+              onAddReport();
+            } else {
+              console.error('onAddReport is not defined');
+            }
+          }}
           className="flex items-center gap-2 px-4 py-2 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors relative z-10"
           type="button"
         >
