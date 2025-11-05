@@ -34,7 +34,6 @@ export function JobDataEntryListPage({ report, jurisdiction, jobs, onBack }: Job
       job.title,
       job.males.toString(),
       job.females.toString(),
-      (job.nonbinary || 0).toString(),
       getClassType(job.males, job.females),
       job.points.toString(),
       formatCurrency(job.min_salary),
@@ -51,7 +50,6 @@ export function JobDataEntryListPage({ report, jurisdiction, jobs, onBack }: Job
         'Class Title',
         'Nbr\nMales',
         'Nbr\nFemales',
-        'Non-\nBinary',
         'Class\nType',
         'Jobs\nPoints',
         'Min Mo\nSalary',
@@ -169,7 +167,6 @@ export function JobDataEntryListPage({ report, jurisdiction, jobs, onBack }: Job
                 <th className="text-left py-2 px-2 font-semibold">Class Title</th>
                 <th className="text-right py-2 px-2 font-semibold">Nbr Males</th>
                 <th className="text-right py-2 px-2 font-semibold">Nbr Females</th>
-                <th className="text-right py-2 px-2 font-semibold">Non-Binary</th>
                 <th className="text-center py-2 px-2 font-semibold">Class Type</th>
                 <th className="text-right py-2 px-2 font-semibold">Jobs Points</th>
                 <th className="text-right py-2 px-2 font-semibold">Min Mo Salary</th>
@@ -186,7 +183,6 @@ export function JobDataEntryListPage({ report, jurisdiction, jobs, onBack }: Job
                   <td className="py-2 px-2 border-b border-gray-200">{job.title}</td>
                   <td className="py-2 px-2 text-right border-b border-gray-200">{job.males}</td>
                   <td className="py-2 px-2 text-right border-b border-gray-200">{job.females}</td>
-                  <td className="py-2 px-2 text-right border-b border-gray-200">{job.nonbinary || 0}</td>
                   <td className="py-2 px-2 text-center border-b border-gray-200">
                     <span className={`px-2 py-1 rounded text-xs font-semibold ${
                       getClassType(job.males, job.females) === 'M' ? 'bg-blue-100 text-blue-800' :

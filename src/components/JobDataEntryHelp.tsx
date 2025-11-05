@@ -56,7 +56,7 @@ export function JobDataEntryHelp({ isOpen, onClose }: JobDataEntryHelpProps) {
                 <Users className="w-6 h-6 text-purple-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Employee Counts (Males, Females, Non-binary)</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Employee Counts (Males, Females)</h3>
                 <p className="text-gray-700 text-sm mb-3">
                   The number of employees in each gender category for this job class. Only count employees who meet the minimum work requirements (67+ days/year and 14+ hours/week, or 100+ days for students).
                 </p>

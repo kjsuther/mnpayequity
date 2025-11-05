@@ -58,7 +58,6 @@ export type JobClassification = {
   title: string;
   males: number;
   females: number;
-  nonbinary: number;
   points: number;
   min_salary: number;
   max_salary: number;

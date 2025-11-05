@@ -47,7 +47,7 @@ export function WhatIfCalculator({ jobs, currentResult, onClose }: WhatIfCalcula
     const cost = Array.from(adjustments.values()).reduce((sum, adj) => {
       const job = jobs.find(j => j.id === adj.jobId);
       if (job) {
-        const employeeCount = job.males + job.females + (job.nonbinary || 0);
+        const employeeCount = job.males + job.females;
         return sum + (adj.adjustment * employeeCount * 12);
       }
       return sum;

@@ -294,7 +294,6 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
           title: job.title,
           males: job.males,
           females: job.females,
-          nonbinary: job.nonbinary || 0,
           points: job.points,
           min_salary: job.min_salary,
           max_salary: job.max_salary,

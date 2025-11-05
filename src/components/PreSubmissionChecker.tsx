@@ -139,10 +139,10 @@ export function PreSubmissionChecker({
       id: 'employee-counts',
       category: 'Job Classifications',
       requirement: 'All jobs have employee counts',
-      status: jobs.every(j => (j.males + j.females + (j.nonbinary || 0)) > 0) ? 'pass' : 'warning',
-      message: jobs.every(j => (j.males + j.females + (j.nonbinary || 0)) > 0)
+      status: jobs.every(j => (j.males + j.females) > 0) ? 'pass' : 'warning',
+      message: jobs.every(j => (j.males + j.females) > 0)
         ? 'All jobs have employee counts'
-        : `${jobs.filter(j => (j.males + j.females + (j.nonbinary || 0)) === 0).length} jobs have no employees`,
+        : `${jobs.filter(j => (j.males + j.females) === 0).length} jobs have no employees`,
       guidance: 'Every job should have at least one employee. Remove jobs with zero employees.'
     });
 

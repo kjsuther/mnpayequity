@@ -33,12 +33,12 @@ export function SubmissionChecklist({
       passed: jobs.every(job =>
         job.title?.trim() &&
         job.points > 0 &&
-        (job.males > 0 || job.females > 0 || job.nonbinary > 0)
+        (job.males > 0 || job.females > 0)
       ),
       critical: true,
       details: jobs.some(job => !job.title?.trim()) ? 'Some jobs are missing titles' :
                jobs.some(job => job.points === 0) ? 'Some jobs have 0 points' :
-               jobs.some(job => job.males === 0 && job.females === 0 && job.nonbinary === 0) ? 'Some jobs have no employees' : 'All required fields complete',
+               jobs.some(job => job.males === 0 && job.females === 0) ? 'Some jobs have no employees' : 'All required fields complete',
     },
     {
       label: 'Job evaluation system specified',

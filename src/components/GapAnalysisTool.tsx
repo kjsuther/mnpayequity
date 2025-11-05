@@ -96,7 +96,7 @@ export function GapAnalysisTool({ jobs, complianceResult, onClose }: GapAnalysis
         const isFemale = gap.job.females > 0 && gap.job.males === 0;
         const isMale = gap.job.males > 0 && gap.job.females === 0;
         const gender = isFemale ? 'Female' : isMale ? 'Male' : 'Balanced';
-        const employeeCount = gap.job.males + gap.job.females + (gap.job.nonbinary || 0);
+        const employeeCount = gap.job.males + gap.job.females;
 
         return [
           gap.job.title,
@@ -278,7 +278,7 @@ export function GapAnalysisTool({ jobs, complianceResult, onClose }: GapAnalysis
                     const isFemale = gap.job.females > 0 && gap.job.males === 0;
                     const isMale = gap.job.males > 0 && gap.job.females === 0;
                     const genderLabel = isFemale ? 'Female' : isMale ? 'Male' : 'Balanced';
-                    const employeeCount = gap.job.males + gap.job.females + (gap.job.nonbinary || 0);
+                    const employeeCount = gap.job.males + gap.job.females;
 
                     return (
                       <tr key={idx} className={`hover:bg-gray-50 ${

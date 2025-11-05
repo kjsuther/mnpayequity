@@ -24,7 +24,6 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob, onCopyJ
     title: '',
     males: 0,
     females: 0,
-    nonbinary: 0,
     points: 0,
     min_salary: 0,
     max_salary: 0,
@@ -67,7 +66,6 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob, onCopyJ
       title: '',
       males: 0,
       females: 0,
-      nonbinary: 0,
       points: 0,
       min_salary: 0,
       max_salary: 0,
@@ -157,7 +155,6 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob, onCopyJ
               <th className="text-left py-2 px-2 font-semibold text-gray-700">Title</th>
               <th className="text-left py-2 px-2 font-semibold text-gray-700">Males</th>
               <th className="text-left py-2 px-2 font-semibold text-gray-700">Females</th>
-              <th className="text-left py-2 px-2 font-semibold text-gray-700">Nonbinary</th>
               <th className="text-left py-2 px-2 font-semibold text-gray-700">Points</th>
               <th className="text-left py-2 px-2 font-semibold text-gray-700">Min Sal</th>
               <th className="text-left py-2 px-2 font-semibold text-gray-700">Max Sal</th>
@@ -194,15 +191,6 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob, onCopyJ
                       type="number"
                       value={formData.females || 0}
                       onChange={(e) => updateField('females', parseInt(e.target.value) || 0)}
-                      className="w-16 px-2 py-1 border border-gray-300 rounded"
-                      min="0"
-                    />
-                  </td>
-                  <td className="py-2 px-2">
-                    <input
-                      type="number"
-                      value={formData.nonbinary || 0}
-                      onChange={(e) => updateField('nonbinary', parseInt(e.target.value) || 0)}
                       className="w-16 px-2 py-1 border border-gray-300 rounded"
                       min="0"
                     />
@@ -290,7 +278,6 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob, onCopyJ
                   <td className="py-2 px-2 font-medium">{job.title}</td>
                   <td className="py-2 px-2">{job.males}</td>
                   <td className="py-2 px-2">{job.females}</td>
-                  <td className="py-2 px-2">{job.nonbinary}</td>
                   <td className="py-2 px-2">{job.points}</td>
                   <td className="py-2 px-2">${job.min_salary.toLocaleString()}</td>
                   <td className="py-2 px-2">${job.max_salary.toLocaleString()}</td>
@@ -344,15 +331,6 @@ export function JobDataEntry({ jobs, onAddJob, onUpdateJob, onDeleteJob, onCopyJ
                     type="number"
                     value={formData.females || 0}
                     onChange={(e) => updateField('females', parseInt(e.target.value) || 0)}
-                    className="w-16 px-2 py-1 border border-gray-300 rounded"
-                    min="0"
-                  />
-                </td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    value={formData.nonbinary || 0}
-                    onChange={(e) => updateField('nonbinary', parseInt(e.target.value) || 0)}
                     className="w-16 px-2 py-1 border border-gray-300 rounded"
                     min="0"
                   />
