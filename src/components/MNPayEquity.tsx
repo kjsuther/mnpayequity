@@ -67,7 +67,7 @@ export function MNPayEquity({ onBack }: MNPayEquityProps) {
             <Scale className="w-10 h-10 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Local Government Pay Equity</h1>
+            <h1 className="text-3xl font-bold text-white">Local Government Pay Equity</h1>
             <p className="text-blue-100 text-lg mt-1">Minnesota Management & Budget</p>
           </div>
         </div>
