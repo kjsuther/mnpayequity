@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Edit, Trash2, Plus, Download, Eye, FileEdit, RotateCcw } from 'lucide-react';
 import { supabase, type Jurisdiction, type Report, type JobClassification } from '../lib/supabase';
 import { EditCaseDescriptionModal } from './EditCaseDescriptionModal';
@@ -27,6 +27,7 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
   const [isImportJobsModalOpen, setIsImportJobsModalOpen] = useState(false);
   const [isAddingInline, setIsAddingInline] = useState(false);
   const [newJob, setNewJob] = useState<Partial<JobClassification>>({});
+  const inlineEditRowRef = useRef<HTMLTableRowElement>(null);
 
   useEffect(() => {
     loadReports();
@@ -320,6 +321,18 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
     }
   }
 
+  function handleTopAddJobClick() {
+    if (jobs.length === 0) {
+      setIsJobEntryMethodModalOpen(true);
+    } else {
+      initializeNewJob();
+      setIsAddingInline(true);
+      setTimeout(() => {
+        inlineEditRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }
+
   function handleCancelInlineAdd() {
     setIsAddingInline(false);
     setNewJob({});
@@ -582,6 +595,17 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
             </div>
           </div>
 
+          <div className="px-6 py-4 border-b border-gray-200 bg-white">
+            <button
+              onClick={handleTopAddJobClick}
+              disabled={isAddingInline || editingJobId !== null}
+              className="flex items-center gap-2 px-4 py-2 bg-[#78BE21] text-white rounded-lg hover:bg-[#6ba51c] transition-colors text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Plus size={18} />
+              Add Job
+            </button>
+          </div>
+
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -733,7 +757,7 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
                   </tr>
                 ))}
                 {isAddingInline && (
-                  <tr className="bg-blue-50 border-2 border-blue-300">
+                  <tr ref={inlineEditRowRef} className="bg-blue-50 border-2 border-blue-300">
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <button
