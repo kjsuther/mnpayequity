@@ -152,12 +152,6 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
               )}
             </div>
             <button
-              onClick={() => onNavigate?.('reports')}
-              className="px-4 py-2 border border-white text-white text-sm font-normal rounded hover:bg-white/10 transition-colors"
-            >
-              Enter Jobs
-            </button>
-            <button
               className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-[#004a7f] rounded transition-colors"
               onClick={handleSignOut}
             >
