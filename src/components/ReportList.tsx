@@ -50,7 +50,7 @@ export function ReportList({
           type="button"
         >
           <Plus className="w-4 h-4" />
-          Add New Case
+          ✓ Add New Case [v2]
         </button>
       </div>
 
