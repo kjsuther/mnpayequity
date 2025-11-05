@@ -24,6 +24,7 @@ import { WelcomeTutorial } from './WelcomeTutorial';
 import { HelpCenter } from './HelpCenter';
 import { DataGatheringGuide } from './DataGatheringGuide';
 import { UserAccountManagement } from './UserAccountManagement';
+import { MNPayEquity } from './MNPayEquity';
 import { supabase, type Jurisdiction, type Contact, type Report, type JobClassification, type ImplementationReport } from '../lib/supabase';
 import { analyzeCompliance, type ComplianceResult } from '../lib/complianceAnalysis';
 
@@ -34,7 +35,7 @@ export function MainApp() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement'>('dashboard');
+  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement' | 'mnPayEquity'>('dashboard');
   const [reportViewType, setReportViewType] = useState<'jobDataEntry' | 'compliance' | 'predictedPay' | 'implementation' | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
@@ -381,7 +382,7 @@ export function MainApp() {
     );
   }
 
-  function handleNavigate(view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement') {
+  function handleNavigate(view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement' | 'mnPayEquity') {
     if (view === 'jobs') {
       if (!currentJurisdiction) {
         alert('Please select a jurisdiction first.');
@@ -454,6 +455,8 @@ export function MainApp() {
           <DataGatheringGuide onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'userManagement' ? (
           <UserAccountManagement onBack={() => setCurrentView('dashboard')} />
+        ) : currentView === 'mnPayEquity' ? (
+          <MNPayEquity onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'dashboard' ? (
           currentJurisdiction ? (
             <Dashboard

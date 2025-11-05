@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { ComprehensiveHelpGuide } from './ComprehensiveHelpGuide';
 
 type HeaderProps = {
-  currentView?: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'userManagement';
-  onNavigate?: (view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'userManagement') => void;
+  currentView?: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'userManagement' | 'mnPayEquity' | 'reportView' | 'dataGuide';
+  onNavigate?: (view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'userManagement' | 'mnPayEquity' | 'reportView' | 'dataGuide') => void;
   hasActiveReport?: boolean;
   hasActiveJurisdiction?: boolean;
   onShowHelp?: () => void;
@@ -126,7 +126,7 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
                         setIsHelpOpen(false);
                         onShowHelp();
                       }}
-                      className="flex items-center gap-3 w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors"
+                      className="flex items-center gap-3 w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors border-b border-gray-100"
                     >
                       <HelpCircle className="w-5 h-5 text-[#003865]" />
                       <div>
@@ -135,6 +135,19 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
                       </div>
                     </button>
                   )}
+                  <button
+                    onClick={() => {
+                      setIsHelpOpen(false);
+                      onNavigate?.('mnPayEquity');
+                    }}
+                    className="flex items-center gap-3 w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <Book className="w-5 h-5 text-[#003865]" />
+                    <div>
+                      <div className="font-medium">MN Pay Equity</div>
+                      <div className="text-xs text-gray-500">Official resources & guidance</div>
+                    </div>
+                  </button>
                 </div>
               )}
             </div>
