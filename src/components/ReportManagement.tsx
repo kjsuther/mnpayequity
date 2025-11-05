@@ -458,36 +458,12 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
       </div>
 
       {!currentReport ? (
-        <>
-          <button
-            onClick={() => {
-              console.log('TEST BUTTON CLICKED');
-              alert('Test button works!');
-              setIsAddReportModalOpen(true);
-            }}
-            style={{
-              position: 'fixed',
-              top: '200px',
-              right: '20px',
-              zIndex: 9999,
-              padding: '20px',
-              backgroundColor: 'red',
-              color: 'white',
-              border: '3px solid yellow',
-              fontSize: '18px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
-            TEST MODAL BUTTON
-          </button>
-          <ReportList
-            reports={reports}
-            onViewReport={handleViewReport}
-            onDeleteReport={handleDeleteReport}
-            onAddReport={() => setIsAddReportModalOpen(true)}
-          />
-        </>
+        <ReportList
+          reports={reports}
+          onViewReport={handleViewReport}
+          onDeleteReport={handleDeleteReport}
+          onAddReport={() => setIsAddReportModalOpen(true)}
+        />
       ) : (
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2">
