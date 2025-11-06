@@ -4,6 +4,7 @@ import { supabase, Report, Jurisdiction, JobClassification, Contact, ComplianceC
 import { analyzeCompliance, ComplianceResult } from '../lib/complianceAnalysis';
 import { ComplianceResults } from './ComplianceResults';
 import { generateCertificatePDF } from '../lib/certificateGenerator';
+import { SuccessModal } from './SuccessModal';
 
 type CaseApprovalModalProps = {
   report: Report;
@@ -22,6 +23,10 @@ export function CaseApprovalModal({ report, jurisdiction, onClose }: CaseApprova
   const [processing, setProcessing] = useState(false);
   const [selectedApprovalType, setSelectedApprovalType] = useState('');
   const [selectedRejectionType, setSelectedRejectionType] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     loadData();
@@ -69,7 +74,8 @@ export function CaseApprovalModal({ report, jurisdiction, onClose }: CaseApprova
 
   async function handleApprove() {
     if (!selectedApprovalType) {
-      alert('Please select an approval reason');
+      setErrorMessage('Please select an approval reason');
+      setShowErrorModal(true);
       return;
     }
 
@@ -112,11 +118,12 @@ export function CaseApprovalModal({ report, jurisdiction, onClose }: CaseApprova
         }).eq('id', report.id);
       }
 
-      alert('Case approved successfully! Certificate has been generated.');
-      onClose();
+      setSuccessMessage('Case approved successfully! Certificate has been generated.');
+      setShowSuccessModal(true);
     } catch (error) {
       console.error('Error approving case:', error);
-      alert('Error approving case. Please try again.');
+      setErrorMessage('Error approving case. Please try again.');
+      setShowErrorModal(true);
     } finally {
       setProcessing(false);
     }
@@ -124,12 +131,14 @@ export function CaseApprovalModal({ report, jurisdiction, onClose }: CaseApprova
 
   async function handleReject() {
     if (!selectedRejectionType) {
-      alert('Please select a rejection reason');
+      setErrorMessage('Please select a rejection reason');
+      setShowErrorModal(true);
       return;
     }
 
     if (!rejectionReason.trim()) {
-      alert('Please provide details about the rejection');
+      setErrorMessage('Please provide details about the rejection');
+      setShowErrorModal(true);
       return;
     }
 
@@ -157,11 +166,12 @@ export function CaseApprovalModal({ report, jurisdiction, onClose }: CaseApprova
         notes: rejectionReason,
       });
 
-      alert('Case has been marked as not in compliance.');
-      onClose();
+      setSuccessMessage('Case has been marked as not in compliance.');
+      setShowSuccessModal(true);
     } catch (error) {
       console.error('Error rejecting case:', error);
-      alert('Error rejecting case. Please try again.');
+      setErrorMessage('Error rejecting case. Please try again.');
+      setShowErrorModal(true);
     } finally {
       setProcessing(false);
     }
@@ -385,6 +395,34 @@ export function CaseApprovalModal({ report, jurisdiction, onClose }: CaseApprova
           )}
         </div>
       </div>
+
+      <SuccessModal
+        isOpen={showSuccessModal}
+        message={successMessage}
+        onClose={() => {
+          setShowSuccessModal(false);
+          onClose();
+        }}
+      />
+
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6 text-center">
+              <div className="flex justify-center mb-4">
+                <XCircle className="w-16 h-16 text-rose-500" />
+              </div>
+              <p className="text-lg text-gray-900 mb-6">{errorMessage}</p>
+              <button
+                onClick={() => setShowErrorModal(false)}
+                className="px-6 py-2 bg-[#D4A574] text-white rounded-lg hover:bg-[#c49563] transition-colors font-medium"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
