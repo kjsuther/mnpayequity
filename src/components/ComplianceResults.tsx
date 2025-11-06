@@ -120,7 +120,20 @@ export function ComplianceResults({ results: result, onBack, reportYear, showBac
       {!result.requiresManualReview && result.statisticalTest && (
         <>
           <div className="border border-gray-200 rounded-xl p-6">
-            <h4 className="text-lg font-bold text-gray-900 mb-6">II. STATISTICAL ANALYSIS TEST</h4>
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-lg font-bold text-gray-900">II. STATISTICAL ANALYSIS TEST</h4>
+              {result.statisticalTest.passed ? (
+                <span className="flex items-center gap-2 text-emerald-600 text-sm font-bold px-3 py-1.5 bg-emerald-50 rounded-lg">
+                  <CheckCircle className="w-5 h-5" />
+                  Passed
+                </span>
+              ) : (
+                <span className="flex items-center gap-2 text-rose-600 text-sm font-bold px-3 py-1.5 bg-rose-50 rounded-lg">
+                  <XCircle className="w-5 h-5" />
+                  Failed
+                </span>
+              )}
+            </div>
 
             <div className="mb-6">
               <h5 className="font-bold text-gray-800 mb-3">A. UNDERPAYMENT RATIO = {result.statisticalTest.underpaymentRatio.toFixed(2)}% *</h5>
