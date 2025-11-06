@@ -6,12 +6,23 @@ export async function processAutoApproval(reportId: string): Promise<boolean> {
   try {
     const { data: report, error: reportError } = await supabase
       .from('reports')
-      .select('*, jurisdiction:jurisdictions(*)')
+      .select('*')
       .eq('id', reportId)
       .single();
 
     if (reportError || !report) {
       console.error('Error fetching report:', reportError);
+      return false;
+    }
+
+    const { data: jurisdiction, error: jurisdictionError } = await supabase
+      .from('jurisdictions')
+      .select('*')
+      .eq('id', report.jurisdiction_id)
+      .single();
+
+    if (jurisdictionError || !jurisdiction) {
+      console.error('Error fetching jurisdiction:', jurisdictionError);
       return false;
     }
 
@@ -48,14 +59,14 @@ export async function processAutoApproval(reportId: string): Promise<boolean> {
     }
 
     if (complianceResult.isCompliant) {
-      const certificateData = await generateCertificatePDF(report, report.jurisdiction);
+      const certificateData = await generateCertificatePDF(report, jurisdiction);
 
       await supabase.from('compliance_certificates').insert({
         report_id: reportId,
         jurisdiction_id: report.jurisdiction_id,
         report_year: report.report_year,
         certificate_data: certificateData,
-        file_name: `${report.jurisdiction.name.replace(/\s+/g, '_')}_Certificate_${report.report_year}.pdf`,
+        file_name: `${jurisdiction.name.replace(/\s+/g, '_')}_Certificate_${report.report_year}.pdf`,
         generated_by: 'Auto-Approval System',
       });
 
@@ -110,6 +121,14 @@ export async function processAutoApproval(reportId: string): Promise<boolean> {
 
 async function sendApprovalNotificationEmail(report: any, certificateData: string) {
   try {
+    const { data: jurisdiction } = await supabase
+      .from('jurisdictions')
+      .select('*')
+      .eq('id', report.jurisdiction_id)
+      .single();
+
+    if (!jurisdiction) return;
+
     const { data: contacts } = await supabase
       .from('contacts')
       .select('*')
@@ -124,13 +143,13 @@ async function sendApprovalNotificationEmail(report: any, certificateData: strin
         jurisdiction_id: report.jurisdiction_id,
         recipient_email: contact.email,
         recipient_name: contact.name,
-        subject: `Pay Equity Report Approved - ${report.jurisdiction.name} - ${report.report_year}`,
+        subject: `Pay Equity Report Approved - ${jurisdiction.name} - ${report.report_year}`,
         body: `
 Dear ${contact.name},
 
 Congratulations! Your pay equity report for ${report.report_year} has been automatically approved.
 
-Jurisdiction: ${report.jurisdiction.name}
+Jurisdiction: ${jurisdiction.name}
 Report Year: ${report.report_year}
 Case Number: ${report.case_number}
 Status: In Compliance
@@ -157,18 +176,26 @@ Pay Equity Unit
 
 async function sendStaffNotificationEmail(report: any, reason: string) {
   try {
+    const { data: jurisdiction } = await supabase
+      .from('jurisdictions')
+      .select('*')
+      .eq('id', report.jurisdiction_id)
+      .single();
+
+    if (!jurisdiction) return;
+
     await supabase.from('email_log').insert({
       email_type: 'staff_notification',
       report_year: report.report_year,
       jurisdiction_id: report.jurisdiction_id,
       recipient_email: 'payequity.mmb@state.mn.us',
       recipient_name: 'Pay Equity Staff',
-      subject: `Case Submitted for Approval - ${report.jurisdiction.name}`,
+      subject: `Case Submitted for Approval - ${jurisdiction.name}`,
       body: `
 A new case has been submitted for approval:
 
-Jurisdiction: ${report.jurisdiction.name}
-Jurisdiction ID: ${report.jurisdiction.jurisdiction_id}
+Jurisdiction: ${jurisdiction.name}
+Jurisdiction ID: ${jurisdiction.jurisdiction_id}
 Report Year: ${report.report_year}
 Case Number: ${report.case_number}
 Submission Date: ${new Date(report.submitted_at).toLocaleString()}

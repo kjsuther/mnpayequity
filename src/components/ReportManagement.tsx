@@ -424,8 +424,11 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
 
       if (error) throw error;
 
-      const { processAutoApproval } = await import('../lib/autoApprovalService');
-      await processAutoApproval(currentReport.id);
+      import('../lib/autoApprovalService').then(({ processAutoApproval }) => {
+        processAutoApproval(currentReport.id).catch(err => {
+          console.error('Auto-approval failed:', err);
+        });
+      });
 
       await loadReports();
       setCurrentReport(null);
