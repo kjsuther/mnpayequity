@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { ArrowLeft, Download, CheckSquare, Square, FileText, ExternalLink } from 'lucide-react';
 import jsPDF from 'jspdf';
 
@@ -68,6 +69,8 @@ const checklistData: ChecklistItem[] = [
 ];
 
 export function DataGatheringGuide({ onBack }: DataGatheringGuideProps) {
+  useScrollToTop();
+
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
 
   const toggleItem = (item: string) => {

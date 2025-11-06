@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FileText, AlertCircle, CheckCircle, Calendar, BookOpen, ClipboardCheck } from 'lucide-react';
 import { Report, Jurisdiction } from '../lib/supabase';
 import { FilteredReportModal } from './FilteredReportModal';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 type DashboardProps = {
   jurisdiction: Jurisdiction;
@@ -14,6 +15,8 @@ type DashboardProps = {
 type FilterType = 'all' | 'submitted' | 'drafts' | 'compliant' | null;
 
 export function Dashboard({ jurisdiction, reports, onManageReports, onViewReport, onShowDataGuide }: DashboardProps) {
+  useScrollToTop();
+
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [currentFilter, setCurrentFilter] = useState<FilterType>(null);
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { supabase } from '../lib/supabase';
 import { AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
 
@@ -7,6 +8,8 @@ type ChangePasswordProps = {
 };
 
 export function ChangePassword({ onBack }: ChangePasswordProps) {
+  useScrollToTop();
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

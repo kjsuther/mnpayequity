@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { ArrowLeft } from 'lucide-react';
 import { supabase, Report, JobClassification, Jurisdiction, ImplementationReport } from '../lib/supabase';
 import { ReportList } from './ReportList';
@@ -23,6 +24,8 @@ type ReportManagementProps = {
 };
 
 export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavigateToReportView, onReportSelect }: ReportManagementProps) {
+  useScrollToTop();
+
   const [reports, setReports] = useState<Report[]>([]);
   const [currentReport, setCurrentReport] = useState<Report | null>(null);
   const [jobs, setJobs] = useState<JobClassification[]>([]);

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { ArrowLeft, Edit, Trash2, Plus, Download, Eye, FileEdit, RotateCcw } from 'lucide-react';
 import { supabase, type Jurisdiction, type Report, type JobClassification } from '../lib/supabase';
 import { EditCaseDescriptionModal } from './EditCaseDescriptionModal';
@@ -14,6 +15,8 @@ type JobsPageProps = {
 };
 
 export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
+  useScrollToTop();
+
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [jobs, setJobs] = useState<JobClassification[]>([]);
@@ -328,9 +331,6 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
     } else {
       initializeNewJob();
       setIsAddingInline(true);
-      setTimeout(() => {
-        inlineEditRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
     }
   }
 

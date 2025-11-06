@@ -1,5 +1,6 @@
 import { Book, ExternalLink, CheckCircle, FileText, GraduationCap, Scale, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 type MNPayEquityProps = {
   onBack: () => void;
@@ -46,6 +47,8 @@ const reportingSteps: ReportingStep[] = [
 ];
 
 export function MNPayEquity({ onBack }: MNPayEquityProps) {
+  useScrollToTop();
+
   const [expandedStep, setExpandedStep] = useState<number | null>(null);
 
   const toggleStep = (stepNumber: number) => {

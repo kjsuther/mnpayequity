@@ -87,6 +87,10 @@ export function MainApp() {
     }
   }, [jobs, selectedReport]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentView, reportViewType]);
+
   async function loadReports(jurisdictionId: string) {
     try {
       const { data, error } = await supabase

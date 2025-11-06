@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Filter } from 'lucide-react';
 import { supabase, Report, Jurisdiction, ComplianceCertificate } from '../lib/supabase';
 import { CaseApprovalModal } from './CaseApprovalModal';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 type ReportWithJurisdiction = Report & {
   jurisdiction: Jurisdiction;
 };
 
 export function ApprovalDashboard() {
+  useScrollToTop();
+
   const [reports, setReports] = useState<ReportWithJurisdiction[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');

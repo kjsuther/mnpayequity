@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { ArrowLeft, Play, FileText, Printer } from 'lucide-react';
 import { supabase, Jurisdiction, Report, JobClassification, Contact } from '../lib/supabase';
 import { analyzeCompliance, ComplianceResult } from '../lib/complianceAnalysis';
@@ -10,6 +11,8 @@ type TestResultsPageProps = {
 };
 
 export function TestResultsPage({ jurisdiction, onBack }: TestResultsPageProps) {
+  useScrollToTop();
+
   const [reportYears, setReportYears] = useState<number[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [casesForYear, setCasesForYear] = useState<Report[]>([]);

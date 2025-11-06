@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { ArrowLeft, Plus, Edit2, Trash2, Search } from 'lucide-react';
 import { supabase, type Jurisdiction, type Note } from '../lib/supabase';
 
@@ -8,6 +9,8 @@ type NotesProps = {
 };
 
 export function Notes({ jurisdiction, onBack }: NotesProps) {
+  useScrollToTop();
+
   const [notes, setNotes] = useState<Note[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);

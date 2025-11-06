@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { ArrowLeft, Mail, AlertTriangle, Calendar } from 'lucide-react';
 import { supabase, type Jurisdiction, type Report } from '../lib/supabase';
 import { AnnouncementJurisdictionList } from './AnnouncementJurisdictionList';
@@ -11,6 +12,8 @@ type SendEmailProps = {
 type EmailView = 'select' | 'announcement' | 'fail_to_report';
 
 export function SendEmail({ onBack }: SendEmailProps) {
+  useScrollToTop();
+
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [currentView, setCurrentView] = useState<EmailView>('select');

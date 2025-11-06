@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { supabase } from '../lib/supabase';
 import type { Jurisdiction } from '../lib/supabase';
 import type { UserProfile } from '../contexts/AuthContext';
@@ -14,6 +15,8 @@ type UserAccountWithAuth = UserProfile & {
 };
 
 export function UserAccountManagement({ onBack }: UserAccountManagementProps) {
+  useScrollToTop();
+
   const { userProfile } = useAuth();
   const [users, setUsers] = useState<UserAccountWithAuth[]>([]);
   const [jurisdictions, setJurisdictions] = useState<Jurisdiction[]>([]);
