@@ -415,10 +415,14 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
           compliance_status: complianceStatus,
           submitted_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+          approval_status: 'draft',
         })
         .eq('id', currentReport.id);
 
       if (error) throw error;
+
+      const { processAutoApproval } = await import('../lib/autoApprovalService');
+      await processAutoApproval(currentReport.id);
 
       await loadReports();
       setCurrentReport(null);

@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { ComprehensiveHelpGuide } from './ComprehensiveHelpGuide';
 
 type HeaderProps = {
-  currentView?: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'userManagement' | 'mnPayEquity' | 'reportView' | 'dataGuide';
-  onNavigate?: (view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'userManagement' | 'mnPayEquity' | 'reportView' | 'dataGuide') => void;
+  currentView?: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'userManagement' | 'mnPayEquity' | 'reportView' | 'dataGuide' | 'approvalDashboard';
+  onNavigate?: (view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'userManagement' | 'mnPayEquity' | 'reportView' | 'dataGuide' | 'approvalDashboard') => void;
   hasActiveReport?: boolean;
   hasActiveJurisdiction?: boolean;
   onShowHelp?: () => void;
@@ -69,7 +69,7 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
     onNavigate?.(view);
   };
 
-  const handleAdminNavigation = (view: 'jurisdictionLookup' | 'userManagement') => {
+  const handleAdminNavigation = (view: 'jurisdictionLookup' | 'userManagement' | 'approvalDashboard') => {
     setIsAdminOpen(false);
     onNavigate?.(view);
   };
@@ -279,6 +279,12 @@ export function Header({ currentView = 'home', onNavigate, hasActiveReport = fal
                       className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                     >
                       Jurisdiction Lookup
+                    </button>
+                    <button
+                      onClick={() => handleAdminNavigation('approvalDashboard')}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Case Approvals
                     </button>
                     <button
                       onClick={() => handleAdminNavigation('userManagement')}

@@ -25,6 +25,7 @@ import { HelpCenter } from './HelpCenter';
 import { DataGatheringGuide } from './DataGatheringGuide';
 import { UserAccountManagement } from './UserAccountManagement';
 import { MNPayEquity } from './MNPayEquity';
+import { ApprovalDashboard } from './ApprovalDashboard';
 import { supabase, type Jurisdiction, type Contact, type Report, type JobClassification, type ImplementationReport } from '../lib/supabase';
 import { analyzeCompliance, type ComplianceResult } from '../lib/complianceAnalysis';
 
@@ -35,7 +36,7 @@ export function MainApp() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement' | 'mnPayEquity'>('dashboard');
+  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement' | 'mnPayEquity' | 'approvalDashboard'>('dashboard');
   const [reportViewType, setReportViewType] = useState<'jobDataEntry' | 'compliance' | 'predictedPay' | 'implementation' | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
@@ -438,7 +439,9 @@ export function MainApp() {
       />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
-        {currentView === 'changePassword' ? (
+        {currentView === 'approvalDashboard' ? (
+          <ApprovalDashboard />
+        ) : currentView === 'changePassword' ? (
           <ChangePassword onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'sendEmail' ? (
           <SendEmail onBack={() => setCurrentView('dashboard')} />
