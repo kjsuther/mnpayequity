@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { ArrowLeft, Edit, Trash2, Plus, Download, Eye, FileEdit, RotateCcw } from 'lucide-react';
 import { supabase, type Jurisdiction, type Report, type JobClassification } from '../lib/supabase';
 import { EditCaseDescriptionModal } from './EditCaseDescriptionModal';
@@ -6,6 +7,7 @@ import { AddJobModal } from './AddJobModal';
 import { JobEntryMethodModal } from './JobEntryMethodModal';
 import { CopyJobsModal } from './CopyJobsModal';
 import { ImportJobsModal } from './ImportJobsModal';
+import { AddReportModal } from './AddReportModal';
 
 type JobsPageProps = {
   jurisdiction: Jurisdiction;
@@ -13,6 +15,8 @@ type JobsPageProps = {
 };
 
 export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
+  useScrollToTop();
+
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [jobs, setJobs] = useState<JobClassification[]>([]);
@@ -25,6 +29,10 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
   const [isJobEntryMethodModalOpen, setIsJobEntryMethodModalOpen] = useState(false);
   const [isCopyJobsModalOpen, setIsCopyJobsModalOpen] = useState(false);
   const [isImportJobsModalOpen, setIsImportJobsModalOpen] = useState(false);
+  const [isAddingInline, setIsAddingInline] = useState(false);
+  const [newJob, setNewJob] = useState<Partial<JobClassification>>({});
+  const inlineEditRowRef = useRef<HTMLTableRowElement>(null);
+  const [isAddReportModalOpen, setIsAddReportModalOpen] = useState(false);
 
   useEffect(() => {
     loadReports();
@@ -292,6 +300,93 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
     return Math.max(...jobs.map(j => j.job_number)) + 1;
   }
 
+  function initializeNewJob() {
+    setNewJob({
+      report_id: selectedReport?.id,
+      job_number: getNextJobNumber(),
+      title: '',
+      males: 0,
+      females: 0,
+      points: 0,
+      min_salary: 0,
+      max_salary: 0,
+      years_to_max: 0,
+      years_service_pay: 0,
+      exceptional_service_category: '',
+    });
+  }
+
+  function handleAddJobClick() {
+    if (jobs.length === 0) {
+      setIsJobEntryMethodModalOpen(true);
+    } else {
+      initializeNewJob();
+      setIsAddingInline(true);
+    }
+  }
+
+  function handleTopAddJobClick() {
+    if (jobs.length === 0) {
+      setIsJobEntryMethodModalOpen(true);
+    } else {
+      initializeNewJob();
+      setIsAddingInline(true);
+    }
+  }
+
+  function handleCancelInlineAdd() {
+    setIsAddingInline(false);
+    setNewJob({});
+  }
+
+  async function handleSaveInlineAdd() {
+    if (!newJob.title?.trim()) {
+      alert('Job title is required');
+      return;
+    }
+
+    if (!selectedReport) return;
+
+    try {
+      const { error } = await supabase
+        .from('job_classifications')
+        .insert([{
+          report_id: selectedReport.id,
+          job_number: newJob.job_number || getNextJobNumber(),
+          title: newJob.title || '',
+          males: newJob.males || 0,
+          females: newJob.females || 0,
+          points: newJob.points || 0,
+          min_salary: newJob.min_salary || 0,
+          max_salary: newJob.max_salary || 0,
+          years_to_max: newJob.years_to_max || 0,
+          years_service_pay: newJob.years_service_pay || 0,
+          exceptional_service_category: newJob.exceptional_service_category || '',
+          benefits_included_in_salary: 0,
+          is_part_time: false,
+          hours_per_week: null,
+          days_per_year: null,
+          additional_cash_compensation: 0,
+        }]);
+
+      if (error) throw error;
+
+      await loadJobs(selectedReport.id);
+      setIsAddingInline(false);
+      setNewJob({});
+    } catch (error) {
+      console.error('Error adding job:', error);
+      alert('Error adding job. Please try again.');
+    }
+  }
+
+  function handleNewJobFieldChange(field: keyof JobClassification, value: string | number) {
+    setNewJob((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  }
+
   function handleJobEntryMethodSelect(method: 'manual' | 'copy' | 'import' | 'none') {
     setIsJobEntryMethodModalOpen(false);
 
@@ -349,7 +444,6 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
           title: newJob.title || '',
           males: newJob.males || 0,
           females: newJob.females || 0,
-          nonbinary: newJob.nonbinary || 0,
           points: newJob.points || 0,
           min_salary: newJob.min_salary || 0,
           max_salary: newJob.max_salary || 0,
@@ -498,6 +592,17 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
                 <div className="text-2xl font-bold text-[#003865]\">{jobs.length}</div>
               </div>
             </div>
+          </div>
+
+          <div className="px-6 py-4 border-b border-gray-200 bg-white">
+            <button
+              onClick={handleTopAddJobClick}
+              disabled={isAddingInline || editingJobId !== null}
+              className="flex items-center gap-2 px-4 py-2 bg-[#78BE21] text-white rounded-lg hover:bg-[#6ba51c] transition-colors text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Plus size={18} />
+              Add Job
+            </button>
           </div>
 
           <div className="overflow-x-auto">
@@ -650,7 +755,106 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
                     )}
                   </tr>
                 ))}
-                {jobs.length === 0 && (
+                {isAddingInline && (
+                  <tr ref={inlineEditRowRef} className="bg-blue-50 border-2 border-blue-300">
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleSaveInlineAdd}
+                          className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-xs font-medium"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={handleCancelInlineAdd}
+                          className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-xs font-medium"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{newJob.job_number}</td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        value={newJob.title || ''}
+                        onChange={(e) => handleNewJobFieldChange('title', e.target.value)}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                        placeholder="Enter job title"
+                        autoFocus
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        value={newJob.males || 0}
+                        onChange={(e) => handleNewJobFieldChange('males', parseInt(e.target.value) || 0)}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-center focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        value={newJob.females || 0}
+                        onChange={(e) => handleNewJobFieldChange('females', parseInt(e.target.value) || 0)}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-center focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        value={newJob.points || 0}
+                        onChange={(e) => handleNewJobFieldChange('points', parseInt(e.target.value) || 0)}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-center focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={newJob.min_salary || 0}
+                        onChange={(e) => handleNewJobFieldChange('min_salary', parseFloat(e.target.value) || 0)}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-right focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={newJob.max_salary || 0}
+                        onChange={(e) => handleNewJobFieldChange('max_salary', parseFloat(e.target.value) || 0)}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-right focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={newJob.years_to_max || 0}
+                        onChange={(e) => handleNewJobFieldChange('years_to_max', parseFloat(e.target.value) || 0)}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-center focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={newJob.years_service_pay || 0}
+                        onChange={(e) => handleNewJobFieldChange('years_service_pay', parseFloat(e.target.value) || 0)}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-center focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        value={newJob.exceptional_service_category || ''}
+                        onChange={(e) => handleNewJobFieldChange('exceptional_service_category', e.target.value)}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-center focus:ring-2 focus:ring-[#003865] focus:border-transparent"
+                      />
+                    </td>
+                  </tr>
+                )}
+                {jobs.length === 0 && !isAddingInline && (
                   <tr>
                     <td colSpan={11} className="px-4 py-12 text-center">
                       <div className="flex flex-col items-center gap-2">
@@ -669,8 +873,9 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
 
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
             <button
-              onClick={() => setIsJobEntryMethodModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#78BE21] text-white rounded-lg hover:bg-[#6ba51c] transition-colors text-sm font-medium shadow-sm"
+              onClick={handleAddJobClick}
+              disabled={isAddingInline || editingJobId !== null}
+              className="flex items-center gap-2 px-4 py-2 bg-[#78BE21] text-white rounded-lg hover:bg-[#6ba51c] transition-colors text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Plus size={18} />
               Add Job
@@ -825,7 +1030,13 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
         </div>
 
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#78BE21] text-white rounded-lg hover:bg-[#6ba51c] transition-colors text-sm font-medium">
+          <button
+            onClick={() => {
+              console.log('Add New Case clicked in JobsPage');
+              setIsAddReportModalOpen(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-[#78BE21] text-white rounded-lg hover:bg-[#6ba51c] transition-colors text-sm font-medium"
+          >
             <Plus size={18} />
             Add New Case
           </button>
@@ -840,6 +1051,16 @@ export function JobsPage({ jurisdiction, onBack }: JobsPageProps) {
           setEditingReport(null);
         }}
         onSave={handleSaveCaseDesc}
+      />
+
+      <AddReportModal
+        isOpen={isAddReportModalOpen}
+        onClose={() => setIsAddReportModalOpen(false)}
+        jurisdictionId={jurisdiction.id}
+        onReportAdded={async () => {
+          await loadReports();
+          setIsAddReportModalOpen(false);
+        }}
       />
     </div>
   );

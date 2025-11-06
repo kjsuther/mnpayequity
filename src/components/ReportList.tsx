@@ -39,6 +39,7 @@ export function ReportList({
         <button
           onClick={onAddReport}
           className="flex items-center gap-2 px-4 py-2 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors"
+          type="button"
         >
           <Plus className="w-4 h-4" />
           Add New Case

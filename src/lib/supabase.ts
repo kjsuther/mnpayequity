@@ -47,6 +47,12 @@ export type Report = {
   alternative_analysis_notes: string | null;
   significant_changes_explanation: string | null;
   requires_manual_review: boolean;
+  approval_status: 'draft' | 'pending' | 'approved' | 'rejected' | 'auto_approved';
+  approved_by: string | null;
+  approved_at: string | null;
+  rejection_reason: string | null;
+  certificate_generated_at: string | null;
+  auto_approved: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -58,7 +64,6 @@ export type JobClassification = {
   title: string;
   males: number;
   females: number;
-  nonbinary: number;
   points: number;
   min_salary: number;
   max_salary: number;
@@ -179,6 +184,41 @@ export type Note = {
   jurisdiction_id: string;
   title: string;
   content: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ComplianceCertificate = {
+  id: string;
+  report_id: string;
+  jurisdiction_id: string;
+  report_year: number;
+  certificate_data: string;
+  file_name: string;
+  generated_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ApprovalHistory = {
+  id: string;
+  report_id: string;
+  jurisdiction_id: string;
+  action_type: string;
+  previous_status: string | null;
+  new_status: string;
+  approved_by: string | null;
+  reason: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
+export type SystemConfig = {
+  id: string;
+  config_key: string;
+  config_value: string;
+  description: string | null;
+  updated_by: string | null;
   created_at: string;
   updated_at: string;
 };

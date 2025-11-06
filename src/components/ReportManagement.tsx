@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { ArrowLeft } from 'lucide-react';
 import { supabase, Report, JobClassification, Jurisdiction, ImplementationReport } from '../lib/supabase';
 import { ReportList } from './ReportList';
@@ -23,6 +24,8 @@ type ReportManagementProps = {
 };
 
 export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavigateToReportView, onReportSelect }: ReportManagementProps) {
+  useScrollToTop();
+
   const [reports, setReports] = useState<Report[]>([]);
   const [currentReport, setCurrentReport] = useState<Report | null>(null);
   const [jobs, setJobs] = useState<JobClassification[]>([]);
@@ -30,6 +33,10 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
   const [complianceResult, setComplianceResult] = useState<ComplianceResult | null>(null);
   const [currentView, setCurrentView] = useState<'jobs' | 'compliance' | 'implementation' | 'notes'>('jobs');
   const [isAddReportModalOpen, setIsAddReportModalOpen] = useState(false);
+
+  useEffect(() => {
+    console.log('isAddReportModalOpen changed:', isAddReportModalOpen);
+  }, [isAddReportModalOpen]);
   const [isCopyJobsModalOpen, setIsCopyJobsModalOpen] = useState(false);
   const [isImportJobsModalOpen, setIsImportJobsModalOpen] = useState(false);
   const [showJobOptions, setShowJobOptions] = useState(false);
@@ -290,7 +297,6 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
           title: job.title,
           males: job.males,
           females: job.females,
-          nonbinary: job.nonbinary || 0,
           points: job.points,
           min_salary: job.min_salary,
           max_salary: job.max_salary,
@@ -412,10 +418,17 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
           compliance_status: complianceStatus,
           submitted_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+          approval_status: 'draft',
         })
         .eq('id', currentReport.id);
 
       if (error) throw error;
+
+      import('../lib/autoApprovalService').then(({ processAutoApproval }) => {
+        processAutoApproval(currentReport.id).catch(err => {
+          console.error('Auto-approval failed:', err);
+        });
+      });
 
       await loadReports();
       setCurrentReport(null);
@@ -600,9 +613,13 @@ export function ReportManagement({ jurisdiction, selectedReport, onBack, onNavig
         </div>
       )}
 
+      {console.log('Rendering AddReportModal, isOpen:', isAddReportModalOpen)}
       <AddReportModal
         isOpen={isAddReportModalOpen}
-        onClose={() => setIsAddReportModalOpen(false)}
+        onClose={() => {
+          console.log('Closing modal');
+          setIsAddReportModalOpen(false);
+        }}
         onSave={handleAddReport}
       />
 

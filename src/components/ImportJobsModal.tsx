@@ -57,7 +57,7 @@ export function ImportJobsModal({ isOpen, onClose, onImport }: ImportJobsModalPr
           }
 
           const headers = jsonData[0].map((h: any) => String(h).trim().toLowerCase());
-          const requiredHeaders = ['jobid', 'title', 'males', 'females', 'nonbinary', 'points', 'mins', 'maxs', 'yrmax', 'yrsrv', 'exsrv'];
+          const requiredHeaders = ['jobid', 'title', 'males', 'females', 'points', 'mins', 'maxs', 'yrmax', 'yrsrv', 'exsrv'];
 
           const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
           if (missingHeaders.length > 0) {
@@ -78,7 +78,6 @@ export function ImportJobsModal({ isOpen, onClose, onImport }: ImportJobsModalPr
                 title: String(row[headers.indexOf('title')] || '').trim(),
                 males: parseInt(String(row[headers.indexOf('males')] || 0)) || 0,
                 females: parseInt(String(row[headers.indexOf('females')] || 0)) || 0,
-                nonbinary: parseInt(String(row[headers.indexOf('nonbinary')] || 0)) || 0,
                 points: parseInt(String(row[headers.indexOf('points')] || 0)) || 0,
                 min_salary: parseFloat(String(row[headers.indexOf('mins')] || 0)) || 0,
                 max_salary: parseFloat(String(row[headers.indexOf('maxs')] || 0)) || 0,
@@ -174,7 +173,7 @@ export function ImportJobsModal({ isOpen, onClose, onImport }: ImportJobsModalPr
             <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
               <li>File must be in Excel format (.xls or .xlsx)</li>
               <li>Tab name must match the filename</li>
-              <li>Must include exact column headers: jobid, title, males, females, nonbinary, points, mins, maxs, yrmax, yrsrv, exsrv</li>
+              <li>Must include exact column headers: jobid, title, males, females, points, mins, maxs, yrmax, yrsrv, exsrv</li>
               <li>Title column is required for each row</li>
             </ul>
           </div>

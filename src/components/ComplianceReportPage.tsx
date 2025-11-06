@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { addLogoToPDF, addPageNumbers, formatCurrency, formatNumber } from '../lib/pdfGenerator';
 import { ComplianceReportGuide } from './ComplianceReportGuide';
+import { ContextualHelp } from './ContextualHelp';
 
 type ComplianceReportPageProps = {
   report: Report;
@@ -294,6 +295,8 @@ export function ComplianceReportPage({ report, jurisdiction, jobs, complianceRes
 
   return (
     <div className="space-y-6">
+      <ContextualHelp context="compliance-testing" />
+
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { JurisdictionSearch } from './JurisdictionSearch';
@@ -19,16 +20,23 @@ import { JobDataEntryListPage } from './JobDataEntryListPage';
 import { ComplianceReportPage } from './ComplianceReportPage';
 import { PredictedPayReportPage } from './PredictedPayReportPage';
 import { ImplementationReportPage } from './ImplementationReportPage';
+import { WelcomeTutorial } from './WelcomeTutorial';
+import { HelpCenter } from './HelpCenter';
+import { DataGatheringGuide } from './DataGatheringGuide';
+import { UserAccountManagement } from './UserAccountManagement';
+import { MNPayEquity } from './MNPayEquity';
+import { ApprovalDashboard } from './ApprovalDashboard';
 import { supabase, type Jurisdiction, type Contact, type Report, type JobClassification, type ImplementationReport } from '../lib/supabase';
 import { analyzeCompliance, type ComplianceResult } from '../lib/complianceAnalysis';
 
 export function MainApp() {
+  const { userProfile, isAdmin } = useAuth();
   const [jurisdictions, setJurisdictions] = useState<Jurisdiction[]>([]);
   const [currentJurisdiction, setCurrentJurisdiction] = useState<Jurisdiction | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement' | 'mnPayEquity' | 'approvalDashboard'>('dashboard');
   const [reportViewType, setReportViewType] = useState<'jobDataEntry' | 'compliance' | 'predictedPay' | 'implementation' | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
@@ -37,6 +45,15 @@ export function MainApp() {
   const [jobs, setJobs] = useState<JobClassification[]>([]);
   const [complianceResult, setComplianceResult] = useState<ComplianceResult | null>(null);
   const [implementationData, setImplementationData] = useState<ImplementationReport | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [showHelpCenter, setShowHelpCenter] = useState(false);
+
+  useEffect(() => {
+    const tutorialCompleted = localStorage.getItem('payEquityTutorialCompleted');
+    if (!tutorialCompleted) {
+      setShowTutorial(true);
+    }
+  }, []);
 
   useEffect(() => {
     loadJurisdictions();
@@ -69,6 +86,10 @@ export function MainApp() {
       setComplianceResult(result);
     }
   }, [jobs, selectedReport]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentView, reportViewType]);
 
   async function loadReports(jurisdictionId: string) {
     try {
@@ -127,7 +148,16 @@ export function MainApp() {
       setJurisdictions(data || []);
 
       if (data && data.length > 0) {
-        setCurrentJurisdiction(data[0]);
+        if (userProfile?.jurisdiction_id) {
+          const userJurisdiction = data.find(j => j.jurisdiction_id === userProfile.jurisdiction_id);
+          if (userJurisdiction) {
+            setCurrentJurisdiction(userJurisdiction);
+          } else {
+            setCurrentJurisdiction(data[0]);
+          }
+        } else {
+          setCurrentJurisdiction(data[0]);
+        }
       }
     } catch (error) {
       console.error('Error loading jurisdictions:', error);
@@ -357,7 +387,7 @@ export function MainApp() {
     );
   }
 
-  function handleNavigate(view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView') {
+  function handleNavigate(view: 'home' | 'dashboard' | 'reports' | 'changePassword' | 'sendEmail' | 'jobs' | 'testResults' | 'jurisdictionLookup' | 'notes' | 'reportView' | 'dataGuide' | 'userManagement' | 'mnPayEquity') {
     if (view === 'jobs') {
       if (!currentJurisdiction) {
         alert('Please select a jurisdiction first.');
@@ -408,32 +438,58 @@ export function MainApp() {
         onNavigate={handleNavigate}
         hasActiveReport={!!selectedReport}
         hasActiveJurisdiction={!!currentJurisdiction}
+        onShowHelp={() => setShowHelpCenter(true)}
+        isAdmin={isAdmin}
       />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
-        {currentView === 'changePassword' ? (
-          <ChangePassword onBack={() => setCurrentView('home')} />
+        {currentView === 'approvalDashboard' ? (
+          <ApprovalDashboard />
+        ) : currentView === 'changePassword' ? (
+          <ChangePassword onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'sendEmail' ? (
-          <SendEmail onBack={() => setCurrentView('home')} />
+          <SendEmail onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'notes' && currentJurisdiction ? (
-          <Notes jurisdiction={currentJurisdiction} onBack={() => setCurrentView('home')} />
+          <Notes jurisdiction={currentJurisdiction} onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'jobs' && currentJurisdiction ? (
-          <JobsPage jurisdiction={currentJurisdiction} onBack={() => setCurrentView('home')} />
+          <JobsPage jurisdiction={currentJurisdiction} onBack={() => setCurrentView('dashboard')} />
         ) : currentView === 'testResults' && currentJurisdiction ? (
           <TestResultsPage
             jurisdiction={currentJurisdiction}
-            onBack={() => setCurrentView('home')}
+            onBack={() => setCurrentView('dashboard')}
           />
-        ) : currentView === 'dashboard' && currentJurisdiction ? (
-          <Dashboard
-            jurisdiction={currentJurisdiction}
-            reports={reports}
-            onManageReports={() => setCurrentView('reports')}
-            onViewReport={(report) => {
-              setSelectedReport(report);
-              setCurrentView('reports');
-            }}
-          />
+        ) : currentView === 'dataGuide' ? (
+          <DataGatheringGuide onBack={() => setCurrentView('dashboard')} />
+        ) : currentView === 'userManagement' ? (
+          <UserAccountManagement onBack={() => setCurrentView('dashboard')} />
+        ) : currentView === 'mnPayEquity' ? (
+          <MNPayEquity onBack={() => setCurrentView('dashboard')} />
+        ) : currentView === 'dashboard' ? (
+          currentJurisdiction ? (
+            <Dashboard
+              jurisdiction={currentJurisdiction}
+              reports={reports}
+              onManageReports={() => setCurrentView('reports')}
+              onViewReport={(report) => {
+                setSelectedReport(report);
+                setCurrentView('reports');
+              }}
+              onShowDataGuide={() => setCurrentView('dataGuide')}
+            />
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to Pay Equity Reporting</h2>
+              <p className="text-gray-600 mb-6">
+                To get started, please select or add a jurisdiction from the Jurisdiction Info page.
+              </p>
+              <button
+                onClick={() => setCurrentView('home')}
+                className="px-6 py-3 bg-[#003865] text-white rounded-lg hover:bg-[#004d7a] transition-colors font-medium"
+              >
+                Go to Jurisdiction Info
+              </button>
+            </div>
+          )
         ) : currentView === 'reports' && currentJurisdiction ? (
           <ReportManagement
             jurisdiction={currentJurisdiction}
@@ -540,6 +596,20 @@ export function MainApp() {
         isOpen={isAddJurisdictionModalOpen}
         onClose={() => setIsAddJurisdictionModalOpen(false)}
         onSave={handleSaveJurisdiction}
+      />
+
+      <WelcomeTutorial
+        isOpen={showTutorial}
+        onClose={() => {
+          setShowTutorial(false);
+          localStorage.setItem('payEquityTutorialCompleted', 'true');
+        }}
+      />
+
+      <HelpCenter
+        isOpen={showHelpCenter}
+        onClose={() => setShowHelpCenter(false)}
+        context={currentView}
       />
     </div>
   );

@@ -231,7 +231,7 @@ function calculateGeneralInfo(
   const maleEmployees = maleJobs.reduce((sum, job) => sum + job.males, 0);
   const femaleEmployees = femaleJobs.reduce((sum, job) => sum + job.females, 0);
   const balancedEmployees = balancedJobs.reduce((sum, job) => sum + job.males + job.females, 0);
-  const totalEmployees = allJobs.reduce((sum, job) => sum + job.males + job.females + (job.nonbinary || 0), 0);
+  const totalEmployees = allJobs.reduce((sum, job) => sum + job.males + job.females, 0);
 
   const avgMaxPayMale = maleJobs.length > 0
     ? maleJobs.reduce((sum, job) => sum + job.max_salary, 0) / maleJobs.length
